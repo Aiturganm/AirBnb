@@ -7,7 +7,8 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import java.time.LocalDate;
 
 @MappedSuperclass
-@Setter @Getter @Builder
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class BaseEntity {
