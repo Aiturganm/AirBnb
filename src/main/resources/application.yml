@@ -1,0 +1,21 @@
+server:
+    port: 9090
+    error:
+        include-binding-errors: always
+        include-exception: true
+        include-message: always
+        include-stacktrace: always
+
+spring:
+    datasource:
+        password: 270907
+        url: jdbc:postgresql://localhost:5432/airbnb
+        username: postgres
+    jpa:
+        hibernate:
+            ddl-auto: create
+        show-sql: true
+
+security:
+    jwt:
+        secret: Java12
