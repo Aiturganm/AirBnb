@@ -9,8 +9,7 @@ import lombok.Setter;
 import project.enums.HouseType;
 
 import java.util.List;
-@Getter
-@Setter
+
 @Builder
 public record UserHouseResponse(
         String userName,

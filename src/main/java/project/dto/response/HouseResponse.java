@@ -11,8 +11,7 @@ import project.enums.HouseType;
 
 import java.util.List;
 
-@Getter
-@Setter
+
 @Builder
 public record HouseResponse (
            Long id,
