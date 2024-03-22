@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
-//    Optional<House> findByHouseName(String houseName);
-//
-//    List<House> sortByPrice(String ascOrDesc);
-//
-//    List<House> betweenPrice(BigDecimal startPrice, BigDecimal finishPrice);
-//
-//    List<House> findbyRegion(Region region);
-//
-//    List<House> filterType(HouseType type);
+        Optional<House> findByHouseName(String houseName);
+
+    List<House> sortByPrice(String ascOrDesc);
+
+    List<House> betweenPrice(BigDecimal startPrice, BigDecimal finishPrice);
+
+    List<House> findbyRegion(Region region);
+
+    List<House> filterType(HouseType type);
 }

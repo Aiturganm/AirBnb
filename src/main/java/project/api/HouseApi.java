@@ -40,30 +40,30 @@ public class HouseApi {
     public SimpleResponse deleteHouse( @PathVariable Long houseId, Principal principal){
         return houseService.deleteHouse(houseId, principal);
     }
-//    @GetMapping("/getHouseByName/{houseName}")
-//    public HouseResponse findByName(@RequestParam String houseName){
-//        return houseService.findByName(houseName);
-//    }
-//    @GetMapping("/getHouseByUserId/{userId}")
-//    public List<UserHouseResponse> findByUserId(@PathVariable Long userId){
-//        return houseService.findByUserId(userId);
-//    }
-//    @GetMapping("/sortByPrice/{ascOrDesc}")
-//    public List<HouseResponse> sortByPrice(@RequestParam String ascOrDesc){
-//        return houseService.sortByPrice(ascOrDesc);
-//    }
-//    @GetMapping("/sortByBetweenPrice/{startPrice}/{FinishPrice}")
-//    public List<HouseResponse> betweenPrice(@PathVariable BigDecimal startPrice, @PathVariable BigDecimal FinishPrice){
-//        return houseService.betweenPrice(startPrice, FinishPrice);
-//    }
-//    @GetMapping("/getHouseByRegion/{region}")
-//    public List<HouseResponse> findByRegion(@RequestParam Region region){
-//        return houseService.findByRegion(region);
-//    }
-//    @GetMapping("/filterByHomeType/{type}")
-//    public List<HouseResponse> filteByType(@RequestParam HouseType type){
-//        return houseService.filterByType(type);
-//    }
+    @GetMapping("/getHouseByName/{houseName}")
+    public HouseResponse findByName(@RequestParam String houseName){
+        return houseService.findByName(houseName);
+    }
+    @GetMapping("/getHouseByUserId/{userId}")
+    public List<UserHouseResponse> findByUserId(@PathVariable Long userId){
+        return houseService.findByUserId(userId);
+    }
+    @GetMapping("/sortByPrice/{ascOrDesc}")
+    public List<HouseResponse> sortByPrice(@RequestParam String ascOrDesc){
+        return houseService.sortByPrice(ascOrDesc);
+    }
+    @GetMapping("/sortByBetweenPrice/{startPrice}/{FinishPrice}")
+    public List<HouseResponse> betweenPrice(@PathVariable BigDecimal startPrice, @PathVariable BigDecimal FinishPrice){
+        return houseService.betweenPrice(startPrice, FinishPrice);
+    }
+    @GetMapping("/getHouseByRegion/{region}")
+    public List<HouseResponse> findByRegion(@RequestParam Region region){
+        return houseService.findByRegion(region);
+    }
+    @GetMapping("/filterByHomeType/{type}")
+    public List<HouseResponse> filteByType(@RequestParam HouseType type){
+        return houseService.filterByType(type);
+    }
 }
 
 
