@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
-        Optional<House> findByHouseName(String houseName);
+    @Query("select s from House s where s.nameOfHotel like :houseName ")
+    Optional<House> findByHouseName(String houseName);
 
     List<House> sortByPrice(String ascOrDesc);
 

@@ -67,7 +67,7 @@ public class HouseServiceImpl implements HouseService {
         List<House> all = houseRepository.findAll();
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : all) {
-            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(),house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
         }
         return houseResponses;
     }
@@ -118,67 +118,68 @@ public class HouseServiceImpl implements HouseService {
                 .build();
     }
 
-//    @Override
-//    public HouseResponse findByName(String houseName) {
-//        House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new RuntimeException());
-//        return   HouseResponse.builder()
-//                .id(house.getId())
-//                .description(house.getDescription())
-//                .houseType(house.getHouseType())
-//                .images(house.getImages())
-//                .room(house.getRoom())
-//                .build();
-//    }
-//
-//    @Override
-//    public List<UserHouseResponse> findByUserId(Long userId) {
-//        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException());
-//       List<UserHouseResponse> userHouseResponses= new ArrayList<>();
-//        for (House house : user.getHouses()) {
-//            userHouseResponses.add(new UserHouseResponse(user.getFirstName(),house.getId(), house.getDescription(), house.getRoom(),house.getHouseType() , house.getImages()));
-//        }
-//        return userHouseResponses;
-//
-//    }
-//
-//    @Override
-//    public List<HouseResponse> sortByPrice(String ascOrDesc) {
-//        List<House> houses = houseRepository.sortByPrice(ascOrDesc);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
-//
-//    @Override
-//    public List<HouseResponse> betweenPrice(BigDecimal startPrice, BigDecimal finishPrice) {
-//        List<House> houses = houseRepository.betweenPrice(startPrice, finishPrice);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
-//
-//    @Override
-//    public List<HouseResponse> findByRegion(Region region) {
-//
-//        List<House> houses = houseRepository.findbyRegion(region);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
-//
-//    @Override
-//    public List<HouseResponse> filterByType(HouseType type) {
-//        List<House> houses = houseRepository.filterType(type);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
+    @Override
+    public HouseResponse findByName(String houseName) {
+        House house = houseRepository.findByHouseName(houseName).orElseThrow(() ->new NotFoundException("house not found"));
+        return   HouseResponse.builder()
+                .id(house.getId())
+                .description(house.getDescription())
+                .houseType(house.getHouseType())
+                .images(house.getImages())
+                .room(house.getRoom())
+                .build();
+    }
+
+    @Override
+    public List<UserHouseResponse> findByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+       List<UserHouseResponse> userHouseResponses= new ArrayList<>();
+        for (House house : user.getHouses()) {
+            userHouseResponses.add(new UserHouseResponse(user.getFirstName(),house.getId(), house.getNameOfHotel(), house.getDescription(),house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+
+        }
+        return userHouseResponses;
+
+    }
+
+    @Override
+    public List<HouseResponse> sortByPrice(String ascOrDesc) {
+        List<House> houses = houseRepository.sortByPrice(ascOrDesc);
+        List<HouseResponse>houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(),house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+        }
+        return houseResponses;
+    }
+
+    @Override
+    public List<HouseResponse> betweenPrice(BigDecimal startPrice, BigDecimal finishPrice) {
+        List<House> houses = houseRepository.betweenPrice(startPrice, finishPrice);
+        List<HouseResponse>houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(),house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+        }
+        return houseResponses;
+    }
+
+    @Override
+    public List<HouseResponse> findByRegion(Region region) {
+
+        List<House> houses = houseRepository.findbyRegion(region);
+        List<HouseResponse>houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(),house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+        }
+        return houseResponses;
+    }
+
+    @Override
+    public List<HouseResponse> filterByType(HouseType type) {
+        List<House> houses = houseRepository.filterType(type);
+        List<HouseResponse>houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(),house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+        }
+        return houseResponses;
+    }
 }
