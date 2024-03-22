@@ -21,6 +21,6 @@ public class RentInfo extends BaseEntity{
 
     @ManyToOne
     private User user;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private House house;
 }

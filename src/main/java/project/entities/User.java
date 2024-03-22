@@ -25,11 +25,11 @@ public class User extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean isBlock;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<House> houses;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<RentInfo> rentInfos;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<Feedback> feedbacks;
 
     public void addHouse(House house){
