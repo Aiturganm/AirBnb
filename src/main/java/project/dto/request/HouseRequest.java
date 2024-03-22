@@ -11,8 +11,6 @@ import project.enums.HouseType;
 import java.util.List;
 
 @Builder
-@Getter
-@Setter
 public record HouseRequest(
          String description,
          byte room,

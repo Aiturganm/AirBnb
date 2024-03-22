@@ -18,6 +18,6 @@ public class HouseApi {
 
     @PostMapping
     public HouseResponse saveHouse(@RequestBody @Valid HouseRequest houseRequest){
-        return
+        return new HouseResponse();
     }
 }
