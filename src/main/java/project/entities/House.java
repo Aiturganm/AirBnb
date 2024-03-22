@@ -6,6 +6,7 @@ import org.apache.catalina.LifecycleState;
 import project.enums.HouseType;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,6 +32,33 @@ public class House extends BaseEntity{
     private boolean isPublished;
     private boolean isBlock;
 
-    @OneToOne
-    private Address address;
+    @OneToMany(mappedBy = "house")
+    private List<Feedback> feedbacks;
+    @ManyToMany
+    private List<Favorite> favorites;
+    @ManyToOne
+    private User user;
+    @OneToMany(mappedBy = "house")
+    private List<RentInfo> rentInfos;
+
+    public void addFeedback(Feedback feedback){
+        if(this.feedbacks == null){
+            this.feedbacks = new ArrayList<>();
+        }
+        this.feedbacks.add(feedback);
+    }
+
+    public void addFavorite(Favorite favorite){
+        if(this.favorites == null){
+            this.favorites = new ArrayList<>();
+        }
+        this.favorites.add(favorite);
+    }
+
+    public void addRentInfo(RentInfo rentInfo){
+        if(this.rentInfos == null){
+            this.rentInfos = new ArrayList<>();
+        }
+        this.rentInfos.add(rentInfo);
+    }
 }

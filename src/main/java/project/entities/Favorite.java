@@ -1,12 +1,10 @@
 package project.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "favorites")
@@ -20,4 +18,6 @@ public class Favorite extends BaseEntity{
     private LocalDate createdAt;
     @OneToOne
     private User user;
+    @ManyToMany
+    private List<House> houses;
 }

@@ -26,6 +26,8 @@ public class Feedback extends BaseEntity{
     private List<Long> dislikes;
     @ManyToOne
     private User user;
+    @ManyToOne
+    private House house;
 
     public void addLikes(Long id){
         if(this.likes == null)  this.likes = new ArrayList<>();
