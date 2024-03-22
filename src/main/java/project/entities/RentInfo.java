@@ -1,9 +1,6 @@
 package project.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -22,10 +19,8 @@ public class RentInfo extends BaseEntity{
     private LocalDate checkOut;
     private BigDecimal totalPrice;
 
-    @OneToOne
-    private House announcement;
-    @OneToOne
-    private User rentUser;
-
-
+    @ManyToOne
+    private User user;
+    @ManyToOne
+    private House house;
 }

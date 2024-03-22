@@ -25,9 +25,31 @@ public class User extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean isBlock;
-    @OneToMany
+    @OneToMany(mappedBy = "user")
     private List<House> houses;
-    @OneToMany
+    @OneToMany(mappedBy = "user")
     private List<RentInfo> rentInfos;
+    @OneToMany(mappedBy = "user")
+    private List<Feedback> feedbacks;
 
+    public void addHouse(House house){
+        if(this.houses == null){
+            this.houses = new ArrayList<>();
+        }
+        this.houses.add(house);
+    }
+
+    public void addRentInfo(RentInfo rentInfo){
+        if(this.rentInfos == null){
+            this.rentInfos = new ArrayList<>();
+        }
+        this.rentInfos.add(rentInfo);
+    }
+
+    public void addFeedback(Feedback feedback){
+        if(this.feedbacks ==  null){
+            this.feedbacks = new ArrayList<>();
+        }
+        this.feedbacks.add(feedback);
+    }
 }
