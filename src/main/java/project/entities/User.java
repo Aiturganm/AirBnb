@@ -25,15 +25,9 @@ public class User extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean isBlock;
-    private String phoneNumber;
-
-    //Relations
-    @OneToOne
-    private Card card;
     @OneToMany
-    private List<Announcement> announcements = new ArrayList<>();
+    private List<House> houses;
     @OneToMany
-    private List<House> houses = new ArrayList<>();
-
+    private List<RentInfo> rentInfos;
 
 }

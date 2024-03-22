@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "rentInfoes")
+@Table(name = "rentInfos")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -20,10 +20,10 @@ import java.time.LocalDate;
 public class RentInfo extends BaseEntity{
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private BigDecimal sum;
-    //Relations
+    private BigDecimal totalPrice;
+
     @OneToOne
-    private Announcement announcement;
+    private House announcement;
     @OneToOne
     private User rentUser;
 
