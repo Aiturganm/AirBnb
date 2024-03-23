@@ -1,0 +1,16 @@
+app:
+  jwt:
+    secret: restaurant
+server:
+  error:
+    include-stacktrace: always
+  port: 9090
+spring:
+  datasource:
+    password: nurkamil192.168
+    url: jdbc:postgresql://localhost:5432/airbnb
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
