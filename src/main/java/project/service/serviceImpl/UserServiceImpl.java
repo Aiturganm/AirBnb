@@ -80,6 +80,5 @@ public class UserServiceImpl implements UserService {
 //                        .message("Success user saved!!!")
 //                        .build())
 //                .build();
-        return null;
     }
 }
