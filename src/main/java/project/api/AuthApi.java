@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.SignInRequest;
-import project.dto.request.SignUpRequest;
 //import project.dto.response.RegisterResponse;
 import project.dto.response.SignResponse;
+import project.dto.response.RegisterResponse;
 import project.service.UserService;
 
 @RestController
@@ -25,4 +25,12 @@ public class AuthApi {
     public SignResponse signIn(@RequestBody SignInRequest signInRequest){
         return userService.signIn(signInRequest);
     }
+//        return userService.signUp(signUpRequest);
+        return null;
+    }
+
+//    @GetMapping
+//    public SignResponse signIn(@RequestBody SignInRequest signInRequest){
+//        return userService.signIn(signInRequest);
+//    }
 }

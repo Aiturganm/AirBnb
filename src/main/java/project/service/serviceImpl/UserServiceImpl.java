@@ -27,11 +27,14 @@ public class UserServiceImpl implements UserService {
     public RegisterResponse signUp(SignUpRequest signUpRequest) {
         boolean exist = userRepository.existsByEmail(signUpRequest.getEmail());
         if (exist) throw new AlreadyExistsException("Email already exists!!!");
+//    private final ;
+//        userRepository.existsByEmail()
         User user = new User();
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
         user.setEmail(signUpRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+
+      user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setRole(signUpRequest.getRole());
         userRepository.save(user);
 
@@ -64,5 +67,19 @@ public class UserServiceImpl implements UserService {
                 .role(user.getRole())
                 .message("Success logIn!")
                 .build();
+      
+//        boolean exists = userRepo.existsByEmail(signUpRequest.getEmail());
+//        if (exists) throw new AlreadyExistsException("Email already exists!!!");
+///
+//        userRepo.save(user);
+//        String newToken = jwtService.createToken(user);
+//        return RegisterResponse.builder()
+//                .token(newToken)
+//                .simpleResponse(SimpleResponse.builder()
+//                        .httpStatus(HttpStatus.OK)
+//                        .message("Success user saved!!!")
+//                        .build())
+//                .build();
+        return null;
     }
 }
