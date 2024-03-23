@@ -2,17 +2,19 @@ package project.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import project.dto.request.SignUpRequest;
-import project.dto.response.SimpleResponse;
+import project.dto.response.RegisterResponse;
 import project.service.UserService;
 
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("api/auth")
 @RequiredArgsConstructor
 @Slf4j
-public class UserApi {
+public class AuthApi {
     private final UserService userService;
 
     @PostMapping("/save")
