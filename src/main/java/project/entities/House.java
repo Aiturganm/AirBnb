@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SequenceGenerator(name = "house_gen",allocationSize = 1)
+@SequenceGenerator(name = "house_gen", sequenceName = "house_seq",allocationSize = 1, initialValue = 1)
 public class House extends BaseEntity{
     private String nameOfHotel;
     private String description;

@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface HouseService {
-    SimpleResponse saveHouse(HouseRequest houseRequest);
+    SimpleResponse saveHouse(HouseRequest houseRequest,Principal principal);
 
     HouseResponse findbyId(Long houseId);
 
@@ -33,4 +33,6 @@ public interface HouseService {
     List<HouseResponse> findByRegion(Region region);
 
     List<HouseResponse> filterByType(HouseType type);
+
+    List<HouseResponse> notPublishedHouses();
 }
