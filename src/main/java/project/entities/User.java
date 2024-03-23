@@ -2,10 +2,14 @@ package project.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import project.enums.Role;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -16,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @SequenceGenerator(name = "user_gen",allocationSize = 1)
-public class User extends BaseEntity{
+public class User extends BaseEntity implements UserDetails {
     private String firstName;
     private String lastName;
     private String email;
@@ -25,31 +29,49 @@ public class User extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean isBlock;
-    @OneToMany(mappedBy = "user")
-    private List<House> houses;
-    @OneToMany(mappedBy = "user")
-    private List<RentInfo> rentInfos;
-    @OneToMany(mappedBy = "user")
-    private List<Feedback> feedbacks;
+    private String phoneNumber;
 
-    public void addHouse(House house){
-        if(this.houses == null){
-            this.houses = new ArrayList<>();
-        }
-        this.houses.add(house);
+    //Relations
+    @OneToOne
+    private Card card;
+    @OneToMany
+    private List<Announcement> announcements = new ArrayList<>();
+    @OneToMany
+    private List<House> houses = new ArrayList<>();
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    public void addRentInfo(RentInfo rentInfo){
-        if(this.rentInfos == null){
-            this.rentInfos = new ArrayList<>();
-        }
-        this.rentInfos.add(rentInfo);
+    @Override
+    public String getPassword() {
+        return password;
     }
 
-    public void addFeedback(Feedback feedback){
-        if(this.feedbacks ==  null){
-            this.feedbacks = new ArrayList<>();
-        }
-        this.feedbacks.add(feedback);
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

@@ -5,22 +5,21 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.enums.HouseType;
 
 import java.util.List;
 
-
 @Builder
-public record HouseResponse (
-           Long id,
-          String description,
-          byte room,
+public record UserHouseResponse(
+        String userName,
+        Long id,
+        String description,
+        byte room,
         @Enumerated(EnumType.STRING)
-          HouseType houseType,
+        HouseType houseType,
         @ElementCollection
-          List<String> images
+        List<String> images
 
-                ){
+) {
 }

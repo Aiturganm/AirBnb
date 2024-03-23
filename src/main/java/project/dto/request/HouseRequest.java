@@ -9,14 +9,16 @@ import lombok.Setter;
 import project.enums.HouseType;
 
 import java.util.List;
+@Getter
+@Setter
 
-@Builder
-public record HouseRequest(
-         String description,
-         byte room,
+
+public class HouseRequest{
+         String description;
+         byte room;
         @Enumerated(EnumType.STRING)
-         HouseType houseType,
+         HouseType houseType;
         @ElementCollection
-         List<String> images
-) {
+         List<String> images;
+
 }

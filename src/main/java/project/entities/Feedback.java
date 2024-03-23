@@ -24,9 +24,9 @@ public class Feedback extends BaseEntity{
     private List<Long> likes;
     @ElementCollection
     private List<Long> dislikes;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private User user;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private House house;
 
     public void addLikes(Long id){
