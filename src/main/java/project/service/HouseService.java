@@ -3,6 +3,7 @@ package project.service;
 import project.dto.request.HouseRequest;
 import project.dto.response.HouseResponse;
 import project.dto.response.SimpleResponse;
+
 import project.dto.response.UserHouseResponse;
 import project.enums.HouseType;
 import project.enums.Region;
@@ -12,6 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface HouseService {
+    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal);
     SimpleResponse saveHouse(HouseRequest houseRequest,Principal principal);
 
     HouseResponse findbyId(Long houseId);

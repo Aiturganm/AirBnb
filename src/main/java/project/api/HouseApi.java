@@ -1,18 +1,24 @@
 package project.api;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.HouseRequest;
 import project.dto.response.HouseResponse;
 import project.dto.response.SimpleResponse;
+
+import project.service.HouseService;
+
+
 import project.dto.response.UserHouseResponse;
 import project.enums.HouseType;
 import project.enums.Region;
 import project.service.HouseService;
 
 import java.math.BigDecimal;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -21,6 +27,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HouseApi {
     private final HouseService houseService;
+
+
+    @PostMapping("/saveHouse")
+    public SimpleResponse saveHouse(@RequestBody @Valid HouseRequest houseRequest, Principal principal){
+        return houseService.saveHouse(houseRequest, principal);
+    }
+
   @PermitAll
     @PostMapping("/saveHouse")
     public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest, Principal principal ) {
@@ -31,6 +44,23 @@ public class HouseApi {
     public HouseResponse findById(@PathVariable Long houseId){
         return houseService.findbyId(houseId);
     }
+    @GetMapping("/findAllHouses")
+    public List<HouseResponse>allHouses(){
+        return houseService.findAll();
+    }
+    @PutMapping("/updateHouse/{houseId}")
+    public SimpleResponse updateHouse(@RequestBody HouseRequest houseRequest, @PathVariable Long houseId, Principal principal){
+        return houseService.updateHouse(houseRequest, houseId, principal);
+    }
+    @GetMapping("/deleteHouse/{houseId}")
+    public SimpleResponse deleteHouse( @PathVariable Long houseId, Principal principal){
+        return houseService.deleteHouse(houseId, principal);
+    }
+    @GetMapping("/getHouseByName/{houseName}")
+    public HouseResponse findByName(@RequestParam String houseName){
+        return houseService.findByName(houseName);
+    }
+
     @PermitAll
     @GetMapping("/findAllHousesPublishedHouses")
     public List<HouseResponse> allHouses(){
@@ -81,7 +111,6 @@ public class HouseApi {
     public List<HouseResponse> filteByType(@RequestParam HouseType type){
         return houseService.filterByType(type);
     }
-
 }
 
 

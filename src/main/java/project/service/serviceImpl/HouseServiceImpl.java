@@ -3,6 +3,15 @@ package project.service.serviceImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.task.TaskSchedulingProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import project.dto.request.HouseRequest;
+import project.dto.response.HouseResponse;
+import project.dto.response.SimpleResponse;
+import project.entities.House;
+import project.entities.User;
+import project.enums.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +30,7 @@ import project.repository.HouseRepository;
 import project.repository.UserRepository;
 import project.service.HouseService;
 
+import java.security.Principal;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -33,6 +43,13 @@ import java.util.List;
 public class HouseServiceImpl implements HouseService {
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
+
+    @Override
+    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal) {
+        String name = principal.getName();
+        User byEmail = userRepository.getByEmail(name);
+        House house = new House();
+        byEmail.getHouses().add(house);
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -60,6 +77,10 @@ house.setUser(byEmail);
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
         house.setImages(houseRequest.getImages());
+        houseRepository.save(house);
+        return SimpleResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("success")
         house.setPrice(houseRequest.getPrice());
         house.setGuests(houseRequest.getGuests());
         house.setNameOfHotel(houseRequest.getNameOfHotel());
@@ -72,6 +93,7 @@ house.setUser(byEmail);
 
     @Override
     public HouseResponse findbyId(Long houseId) {
+        House house = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
 
         return HouseResponse.builder()
@@ -89,6 +111,8 @@ house.setUser(byEmail);
     public List<HouseResponse> findAll() {
         List<House> all = houseRepository.findAll();
         List<HouseResponse> houseResponses = new ArrayList<>();
+        for (House house : all) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
 
         for (House house : all) {
             if (house.isPublished()) {
@@ -100,11 +124,16 @@ house.setUser(byEmail);
 
     @Override
     public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal) {
+        House house1 = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
+                house1.setDescription(houseRequest.getDescription());
+                house1.setHouseType(houseRequest.getHouseType());
+                house1.setRoom(houseRequest.getRoom());
+                house1.setImages(houseRequest.getImages());
                 house.setHouseType(houseRequest.getHouseType());
                 house.setDescription(houseRequest.getDescription());
                 house.setRoom(houseRequest.getRoom());
@@ -128,11 +157,14 @@ house.setUser(byEmail);
 
     @Override
     public SimpleResponse deleteHouse(Long houseId, Principal principal) {
+        House house1 = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
+              houseRepository.delete(house1);
+
                 houseRepository.delete(house1);
                 SimpleResponse.builder()
                         .httpStatus(HttpStatus.OK)

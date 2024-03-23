@@ -1,4 +1,23 @@
 package project.config.jwt;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import project.entities.User;
+
+
+import java.time.ZonedDateTime;
+
+@Service
+public class JwtService {
+
+    @Value("${security.jwt.secret}")
+    private String secretKey;
+
+    public String createToken(User user) {
+
 
 
 import com.auth0.jwt.JWT;
@@ -32,6 +51,12 @@ public class JwtService {
                 .sign(algorithm);
     }
 
+    //verify token(decode)
+    public String verifyToken(String token) {
+        Algorithm algorithm = Algorithm.HMAC512(secretKey);
+        JWTVerifier jwtVerifier = JWT.require(algorithm).build();
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        return decodedJWT.getClaim("email").asString();
     // Verify token (decode)
     public String verifyToken(String token) {
         try {
