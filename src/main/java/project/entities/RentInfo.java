@@ -1,16 +1,13 @@
 package project.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "rentInfoes")
+@Table(name = "rentInfos")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -20,12 +17,10 @@ import java.time.LocalDate;
 public class RentInfo extends BaseEntity{
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private BigDecimal sum;
-    //Relations
-    @OneToOne
-    private Announcement announcement;
-    @OneToOne
-    private User rentUser;
+    private BigDecimal totalPrice;
 
-
+    @ManyToOne
+    private User user;
+    @ManyToOne(cascade = {CascadeType.PERSIST})
+    private House house;
 }

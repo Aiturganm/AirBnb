@@ -1,24 +1,20 @@
 package project.dto.request;
-
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import project.enums.HouseType;
-
+import java.math.BigDecimal;
 import java.util.List;
-
-@Builder
 @Getter
 @Setter
-public record HouseRequest(
-         String description,
-         byte room,
-        @Enumerated(EnumType.STRING)
-         HouseType houseType,
-        @ElementCollection
-         List<String> images
-) {
+public class HouseRequest {
+    String nameOfHotel;
+    String description;
+    private List<String> images;
+    private byte room;
+    private HouseType houseType;
+    private BigDecimal price;
+    private int guests;
+
 }

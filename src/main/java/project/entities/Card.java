@@ -1,7 +1,5 @@
 package project.entities;
-import jakarta.persistence.Entity;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,4 +15,6 @@ import java.math.BigDecimal;
 public class Card extends BaseEntity{
     private int carNumber;
     private BigDecimal money;
+    @OneToOne(cascade = {CascadeType.PERSIST})
+    private User user;
 }
