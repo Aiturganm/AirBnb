@@ -1,5 +1,7 @@
 package project.service;
 
-public interface UserService {
+import project.api.RegisterResponse;
+import project.dto.request.SignUpRequest;
 
+public interface UserService {
 }
