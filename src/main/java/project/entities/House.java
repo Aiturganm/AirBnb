@@ -32,13 +32,13 @@ public class House extends BaseEntity{
     private boolean isPublished;
     private boolean isBlock;
 
-    @OneToMany(mappedBy = "house")
+    @OneToMany(mappedBy = "house", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<Feedback> feedbacks;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<Favorite> favorites;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private User user;
-    @OneToMany(mappedBy = "house")
+    @OneToMany(mappedBy = "house", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<RentInfo> rentInfos;
 
     public void addFeedback(Feedback feedback){

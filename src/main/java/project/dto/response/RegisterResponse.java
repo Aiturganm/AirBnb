@@ -1,7 +1,6 @@
-package project.api;
+package project.dto.response;
 
 import lombok.Builder;
-import project.dto.response.SimpleResponse;
 
 @Builder
 public record RegisterResponse(

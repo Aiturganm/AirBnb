@@ -17,6 +17,6 @@ public class Address extends BaseEntity{
     private Region region;
     private String city;
     private String street;
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.REMOVE})
     private House house;
 }
