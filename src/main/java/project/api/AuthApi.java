@@ -6,10 +6,8 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
-import project.dto.request.UserRequest;
 import project.dto.response.SignResponse;
 import project.dto.response.RegisterResponse;
-import project.dto.response.SimpleResponse;
 import project.service.UserService;
 
 @RestController
