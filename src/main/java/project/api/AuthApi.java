@@ -5,10 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.SignInRequest;
-<<<<<<< HEAD
-//import project.dto.response.RegisterResponse;
-=======
->>>>>>> efcda8693e37c21bad618137035a5a27a6d10d21
 import project.dto.request.SignUpRequest;
 import project.dto.response.SignResponse;
 import project.dto.response.RegisterResponse;
