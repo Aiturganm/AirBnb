@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import project.api.RegisterResponse;
 import project.config.jwt.JwtService;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
+import project.dto.response.RegisterResponse;
 import project.dto.response.SignResponse;
 import project.dto.response.SimpleResponse;
 import project.entities.User;
@@ -27,8 +27,6 @@ public class UserServiceImpl implements UserService {
     public RegisterResponse signUp(SignUpRequest signUpRequest) {
         boolean exist = userRepository.existsByEmail(signUpRequest.getEmail());
         if (exist) throw new AlreadyExistsException("Email already exists!!!");
-//    private final ;
-//        userRepository.existsByEmail()
         User user = new User();
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
@@ -67,19 +65,5 @@ public class UserServiceImpl implements UserService {
                 .role(user.getRole())
                 .message("Success logIn!")
                 .build();
-      
-//        boolean exists = userRepo.existsByEmail(signUpRequest.getEmail());
-//        if (exists) throw new AlreadyExistsException("Email already exists!!!");
-///
-//        userRepo.save(user);
-//        String newToken = jwtService.createToken(user);
-//        return RegisterResponse.builder()
-//                .token(newToken)
-//                .simpleResponse(SimpleResponse.builder()
-//                        .httpStatus(HttpStatus.OK)
-//                        .message("Success user saved!!!")
-//                        .build())
-//                .build();
-        return null;
     }
 }
