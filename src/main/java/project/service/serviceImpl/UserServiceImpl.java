@@ -77,6 +77,21 @@ public class UserServiceImpl implements UserService {
                 .role(user.getRole())
                 .message("Success logIn!")
                 .build();
+<<<<<<< HEAD
+      
+//        boolean exists = userRepo.existsByEmail(signUpRequest.getEmail());
+//        if (exists) throw new AlreadyExistsException("Email already exists!!!");
+///
+//        userRepo.save(user);
+//        String newToken = jwtService.createToken(user);
+//        return RegisterResponse.builder()
+//                .token(newToken)
+//                .simpleResponse(SimpleResponse.builder()
+//                        .httpStatus(HttpStatus.OK)
+//                        .message("Success user saved!!!")
+//                        .build())
+//                .build();
+=======
     }
 
     @Override
@@ -101,6 +116,7 @@ public class UserServiceImpl implements UserService {
                 .size(usersPage.getTotalPages())
                 .userResponses(userResponses)
                 .build();
+>>>>>>> efcda8693e37c21bad618137035a5a27a6d10d21
     }
 
     @Override

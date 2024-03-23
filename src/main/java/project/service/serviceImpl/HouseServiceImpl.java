@@ -51,16 +51,22 @@ public class HouseServiceImpl implements HouseService {
 
 
     @Override
-    public SimpleResponse saveHouse(HouseRequest houseRequest) {
+    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal) {
         House house = new House();
+        String name = principal.getName();
+        User byEmail = userRepository.getByEmail(name);
+house.setUser(byEmail);
         house.setHouseType(houseRequest.getHouseType());
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
         house.setImages(houseRequest.getImages());
+        house.setPrice(houseRequest.getPrice());
+        house.setGuests(houseRequest.getGuests());
+        house.setNameOfHotel(houseRequest.getNameOfHotel());
         houseRepository.save(house);
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("success")
+                .message("house with name "+house.getNameOfHotel()+" successfully saved")
                 .build();
     }
 
@@ -74,6 +80,8 @@ public class HouseServiceImpl implements HouseService {
                 .houseType(house.getHouseType())
                 .images(house.getImages())
                 .room(house.getRoom())
+                .guests(house.getGuests())
+                .price(house.getPrice())
                 .build();
     }
 
@@ -81,8 +89,11 @@ public class HouseServiceImpl implements HouseService {
     public List<HouseResponse> findAll() {
         List<House> all = houseRepository.findAll();
         List<HouseResponse> houseResponses = new ArrayList<>();
+
         for (House house : all) {
-            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            if (house.isPublished()) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            }
         }
         return houseResponses;
     }
@@ -94,10 +105,13 @@ public class HouseServiceImpl implements HouseService {
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                house1.setDescription(houseRequest.getDescription());
-                house1.setHouseType(houseRequest.getHouseType());
-                house1.setRoom(houseRequest.getRoom());
-                house1.setImages(houseRequest.getImages());
+                house.setHouseType(houseRequest.getHouseType());
+                house.setDescription(houseRequest.getDescription());
+                house.setRoom(houseRequest.getRoom());
+                house.setImages(houseRequest.getImages());
+                house.setPrice(houseRequest.getPrice());
+                house.setGuests(houseRequest.getGuests());
+                house.setNameOfHotel(houseRequest.getNameOfHotel());
                 houseRepository.save(house1);
                 return SimpleResponse.builder()
                         .httpStatus(HttpStatus.OK)
@@ -219,5 +233,18 @@ if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equ
         }
 
         throw new NotFoundException("not found");
+    }
+
+    @Override
+    public List<HouseResponse> notPublishedHouses() {
+        List<House> all = houseRepository.findAll();
+        List<HouseResponse> houseResponses = new ArrayList<>();
+
+        for (House house : all) {
+            if (!house.isPublished()) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            }
+        }
+        return houseResponses;
     }
 }
