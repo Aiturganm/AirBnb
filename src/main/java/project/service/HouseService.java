@@ -12,7 +12,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface HouseService {
-    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal);
+    SimpleResponse saveHouse(HouseRequest houseRequest);
 
     HouseResponse findbyId(Long houseId);
 

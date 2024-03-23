@@ -1,7 +1,8 @@
 package project.api;
 
-import jakarta.validation.Valid;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.HouseRequest;
 import project.dto.response.HouseResponse;
@@ -20,9 +21,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HouseApi {
     private final HouseService houseService;
+    @Secured("ADMIN")
     @PostMapping("/saveHouse")
-    public SimpleResponse saveHouse(@RequestBody @Valid HouseRequest houseRequest, Principal principal){
-        return houseService.saveHouse(houseRequest, principal);
+    public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest) {
+        return houseService.saveHouse(houseRequest);
     }
     @GetMapping("/getHouseById/{houseId}")
     public HouseResponse findById(@PathVariable Long houseId){
@@ -64,6 +66,7 @@ public class HouseApi {
     public List<HouseResponse> filteByType(@RequestParam HouseType type){
         return houseService.filterByType(type);
     }
+
 }
 
 

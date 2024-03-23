@@ -18,7 +18,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @SequenceGenerator(name = "user_gen",allocationSize = 1)
 public class User extends BaseEntity implements UserDetails {
     private String firstName;
@@ -31,11 +30,31 @@ public class User extends BaseEntity implements UserDetails {
     private boolean isBlock;
     private String phoneNumber;
 
+    public User(Long id, LocalDate createdAt, LocalDate updatedAt, String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, String phoneNumber) {
+        super(id, createdAt, updatedAt);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.dateOfBirth = dateOfBirth;
+        this.role = role;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public User(String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, boolean isBlock, String phoneNumber) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.dateOfBirth = dateOfBirth;
+        this.role = role;
+        this.isBlock = isBlock;
+        this.phoneNumber = phoneNumber;
+    }
+
     //Relations
     @OneToOne
     private Card card;
-    @OneToMany
-    private List<Announcement> announcements = new ArrayList<>();
     @OneToMany
     private List<House> houses = new ArrayList<>();
 

@@ -18,7 +18,6 @@ public class HouseRequest{
 
      String nameOfHotel;
      String description;
-    @ElementCollection
     private List<String> images;
     private byte room;
     @Enumerated(EnumType.STRING)
