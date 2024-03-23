@@ -56,6 +56,7 @@ public class UserServiceImpl implements UserService {
             throw new ForbiddenException("Forbidden 403(wrong password)!");
         }
         String token = jwtService.createToken(user);
+
         return SignResponse.builder()
                 .token(token)
                 .id(user.getId())
