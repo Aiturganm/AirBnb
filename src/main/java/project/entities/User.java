@@ -20,15 +20,15 @@ import java.util.List;
 @AllArgsConstructor
 @SequenceGenerator(name = "user_gen",allocationSize = 1)
 public class User extends BaseEntity implements UserDetails {
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private LocalDate dateOfBirth;
-    @Enumerated(EnumType.STRING)
-    private Role role;
-    private boolean isBlock;
-    private String phoneNumber;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String password;
+        private LocalDate dateOfBirth;
+        @Enumerated(EnumType.STRING)
+        private Role role;
+        private boolean isBlock;
+        private String phoneNumber;
 
     public User(Long id, LocalDate createdAt, LocalDate updatedAt, String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, String phoneNumber) {
         super(id, createdAt, updatedAt);
