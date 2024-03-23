@@ -1,10 +1,12 @@
 package project.service.serviceImpl;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.config.jwt.JwtService;
 import project.dto.request.HouseRequest;
 import project.dto.response.HouseResponse;
 import project.dto.response.SimpleResponse;
@@ -21,6 +23,7 @@ import project.service.HouseService;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,14 +33,26 @@ import java.util.List;
 public class HouseServiceImpl implements HouseService {
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    @PostConstruct
+    public UserResponse initUser(){
+        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role. ADMIN, true, "njdkmvscl");
+        userRepository.save(user);
+        return UserResponse.builder()
+                .token(jwtService.createToken(user))
+                .email(user.getEmail())
+                .role(user.getRole())
+                .httpStatus(HttpStatus.OK)
+
+                .build();
+    }
 
 
     @Override
-    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal) {
-        String name = principal.getName();
-        User byEmail = userRepository.getByEmail(name);
+    public SimpleResponse saveHouse(HouseRequest houseRequest) {
         House house = new House();
-        byEmail.getHouses().add(house);
         house.setHouseType(houseRequest.getHouseType());
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
@@ -67,7 +82,7 @@ public class HouseServiceImpl implements HouseService {
         List<House> all = houseRepository.findAll();
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : all) {
-            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
         }
         return houseResponses;
     }
@@ -118,67 +133,91 @@ public class HouseServiceImpl implements HouseService {
                 .build();
     }
 
-//    @Override
-//    public HouseResponse findByName(String houseName) {
-//        House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new RuntimeException());
-//        return   HouseResponse.builder()
-//                .id(house.getId())
-//                .description(house.getDescription())
-//                .houseType(house.getHouseType())
-//                .images(house.getImages())
-//                .room(house.getRoom())
-//                .build();
-//    }
-//
-//    @Override
-//    public List<UserHouseResponse> findByUserId(Long userId) {
-//        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException());
-//       List<UserHouseResponse> userHouseResponses= new ArrayList<>();
-//        for (House house : user.getHouses()) {
-//            userHouseResponses.add(new UserHouseResponse(user.getFirstName(),house.getId(), house.getDescription(), house.getRoom(),house.getHouseType() , house.getImages()));
-//        }
-//        return userHouseResponses;
-//
-//    }
-//
-//    @Override
-//    public List<HouseResponse> sortByPrice(String ascOrDesc) {
-//        List<House> houses = houseRepository.sortByPrice(ascOrDesc);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
-//
-//    @Override
-//    public List<HouseResponse> betweenPrice(BigDecimal startPrice, BigDecimal finishPrice) {
-//        List<House> houses = houseRepository.betweenPrice(startPrice, finishPrice);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
-//
-//    @Override
-//    public List<HouseResponse> findByRegion(Region region) {
-//
-//        List<House> houses = houseRepository.findbyRegion(region);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
-//
-//    @Override
-//    public List<HouseResponse> filterByType(HouseType type) {
-//        List<House> houses = houseRepository.filterType(type);
-//        List<HouseResponse>houseResponses = new ArrayList<>();
-//        for (House house : houses) {
-//            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
-//        }
-//        return houseResponses;
-//    }
+    @Override
+    public HouseResponse findByName(String houseName) {
+        House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new NotFoundException("house not found"));
+        return HouseResponse.builder()
+                .id(house.getId())
+                .description(house.getDescription())
+                .houseType(house.getHouseType())
+                .images(house.getImages())
+                .room(house.getRoom())
+                .build();
+    }
+
+    @Override
+    public List<UserHouseResponse> findByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+        List<UserHouseResponse> userHouseResponses = new ArrayList<>();
+        for (House house : user.getHouses()) {
+            userHouseResponses.add(new UserHouseResponse(user.getFirstName(), house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+
+        }
+        return userHouseResponses;
+
+    }
+
+    @Override
+    public List<HouseResponse> sortByPrice(String ascOrDesc) {
+        List<HouseResponse> houseResponses = new ArrayList<>();
+        if (ascOrDesc.equalsIgnoreCase("asc")) {
+            List<House> houseAsc = houseRepository.sortAsc("asc");
+            for (House house : houseAsc) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            }
+        } else if (ascOrDesc.equalsIgnoreCase("desc")) {
+            List<House> houseDesc = houseRepository.sortDesc("desc");
+            for (House house : houseDesc) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            }
+        }
+        return houseResponses;
+    }
+
+    @Override
+    public List<HouseResponse> betweenPrice(BigDecimal startPrice, BigDecimal finishPrice) {
+        List<House> houses = houseRepository.betweenPrice(startPrice, finishPrice);
+        List<HouseResponse> houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+        }
+        return houseResponses;
+    }
+
+    @Override
+    public List<HouseResponse> findByRegion(Region region) {
+if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equals(region) || Region.NARYN.equals(region) || Region.TALAS.equals(region) || Region.JALAL_ABAD.equals(region) || Region.YSSYK_KOL.equals(region)) {
+    List<House> houses = houseRepository.findByRegion(region);
+    List<HouseResponse> houseResponses = new ArrayList<>();
+    for (House house : houses) {
+        houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+    }
+    return houseResponses;
+       }
+        throw new NotFoundException("not found");
+    }
+
+    @Override
+    public List<HouseResponse> filterByType(HouseType type) {
+        if (HouseType.HOUSE.equals(type)) {
+            List<House> houses = houseRepository.filterByType(type);
+            List<HouseResponse> houseResponses = new ArrayList<>();
+            for (House house : houses) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+
+            }
+            return houseResponses;
+        } else if (HouseType.APARTMENT.equals(type)) {
+            List<House> houses = houseRepository.filterByType(type);
+            List<HouseResponse> houseResponses = new ArrayList<>();
+            for (House house : houses) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+
+            }
+            return houseResponses;
+
+        }
+
+        throw new NotFoundException("not found");
+    }
 }
