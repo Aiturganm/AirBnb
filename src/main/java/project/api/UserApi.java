@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.SignUpRequest;
+import project.dto.request.UserRequest;
 import project.dto.response.PaginationUserResponse;
 import project.dto.response.RegisterResponse;
 import project.dto.response.SimpleResponse;
@@ -21,5 +22,10 @@ public class UserApi {
     public PaginationUserResponse findAll(@RequestParam int page,
                                           @RequestParam int size){
        return userService.findAll(page,size);
+    }
+    @PutMapping("/{userId}")
+    public SimpleResponse update(@PathVariable Long userId,
+                                 @RequestBody UserRequest userRequest){
+        return userService.update(userId,userRequest);
     }
 }
