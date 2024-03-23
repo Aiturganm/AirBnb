@@ -16,9 +16,4 @@ import project.service.UserService;
 public class UserApi {
     private final UserService userService;
 
-    @PostMapping("/save")
-    public RegisterResponse signUp(@RequestBody SignUpRequest signUpRequest){
-        log.info("success saved!!!");
-        return userService.signUp(signUpRequest);
-    }
 }
