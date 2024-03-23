@@ -1,5 +1,6 @@
 package project.config.jwt;
 
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -12,10 +13,12 @@ import project.entities.User;
 
 import java.time.ZonedDateTime;
 
+
+
 @Service
 public class JwtService {
 
-    @Value("${security.jwt.secret}")
+    @Value("${app.jwt.secret}")
     private String secretKey;
 
     public String createToken(User user) {
