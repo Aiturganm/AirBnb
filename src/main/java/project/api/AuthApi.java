@@ -2,11 +2,10 @@ package project.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import project.dto.request.SignUpRequest;
+import org.springframework.web.bind.annotation.*;
+import project.dto.request.SignInRequest;
+//import project.dto.response.RegisterResponse;
+import project.dto.response.SignResponse;
 import project.dto.response.RegisterResponse;
 import project.service.UserService;
 
@@ -20,6 +19,12 @@ public class AuthApi {
     @PostMapping("/save")
     public RegisterResponse signUp(@RequestBody SignUpRequest signUpRequest){
         log.info("success saved!!!");
+        return userService.signUp(signUpRequest);
+    }
+    @GetMapping("signIn")
+    public SignResponse signIn(@RequestBody SignInRequest signInRequest){
+        return userService.signIn(signInRequest);
+    }
 //        return userService.signUp(signUpRequest);
         return null;
     }

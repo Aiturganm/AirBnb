@@ -2,9 +2,10 @@ package project.service;
 
 import project.api.RegisterResponse;
 import project.dto.request.SignUpRequest;
-import project.dto.response.RegisterResponse;
+import project.dto.response.SignResponse;
 
 public interface UserService {
-    //    private final ;
     RegisterResponse signUp(SignUpRequest signUpRequest);
+
+    SignResponse signIn(SignInRequest signInRequest);
 }

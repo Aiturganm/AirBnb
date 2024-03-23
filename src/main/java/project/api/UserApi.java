@@ -19,8 +19,8 @@ public class UserApi {
     @PostMapping("/save")
     public RegisterResponse signUp(@RequestBody SignUpRequest signUpRequest){
         log.info("success saved!!!");
+        return userService.signUp(signUpRequest);
 //        return userService.signUp(signUpRequest);
-        return null;
     }
 //    @GetMapping
 //    public SignResponse signIn(@RequestBody SignInRequest signInRequest){
