@@ -2,6 +2,7 @@ package project.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
@@ -16,6 +17,7 @@ import project.service.UserService;
 public class AuthApi {
     private final UserService userService;
 
+    @Secured("ADMIN")
     @PostMapping("/save")
     public RegisterResponse signUp(@RequestBody SignUpRequest signUpRequest){
         log.info("success saved!!!");
