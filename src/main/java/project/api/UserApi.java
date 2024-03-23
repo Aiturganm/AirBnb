@@ -20,10 +20,5 @@ public class UserApi {
     public RegisterResponse signUp(@RequestBody SignUpRequest signUpRequest){
         log.info("success saved!!!");
         return userService.signUp(signUpRequest);
-//        return userService.signUp(signUpRequest);
     }
-//    @GetMapping
-//    public SignResponse signIn(@RequestBody SignInRequest signInRequest){
-//        return userService.signIn(signInRequest);
-//    }
 }
