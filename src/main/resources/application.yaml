@@ -1,0 +1,13 @@
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/airbn
+    password: nurlan21
+    username: postgres
+app:
+  jwt:
+    secret: "ERLAN@!"
