@@ -56,6 +56,7 @@ public class HouseServiceImpl implements HouseService {
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
 house.setUser(byEmail);
+byEmail.getHouses().add(house);
         house.setHouseType(houseRequest.getHouseType());
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());

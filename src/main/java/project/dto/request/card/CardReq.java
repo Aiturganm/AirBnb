@@ -2,6 +2,7 @@ package project.dto.request.card;
 
 import jakarta.validation.constraints.NegativeOrZero;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,13 +16,13 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 public class CardReq {
-    @NotBlank
-    private int carNumber;
+    @NotNull
+    private int cardNumber;
     @PriceValidation
     private BigDecimal money;
 
 
     public Card convert() {
-        return new Card(this.carNumber,this.money);
+        return new Card(this.cardNumber,this.money);
     }
 }

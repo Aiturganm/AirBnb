@@ -52,7 +52,7 @@ public class HouseApi {
         return houseService.deleteHouse(houseId, principal);
     }
     @PermitAll
-    @GetMapping("/getHouseByName/{houseName}")
+    @GetMapping("/getHouseByName")
     public HouseResponse findByName(@RequestParam String houseName){
         return houseService.findByName(houseName);
     }
@@ -62,7 +62,7 @@ public class HouseApi {
         return houseService.findByUserId(userId);
     }
     @PermitAll
-    @GetMapping("/sortByPrice/{ascOrDesc}")
+    @GetMapping("/sortByPrice")
     public List<HouseResponse> sortByPrice(@RequestParam String ascOrDesc){
         return houseService.sortByPrice(ascOrDesc);
     }
@@ -72,13 +72,13 @@ public class HouseApi {
         return houseService.betweenPrice(startPrice, FinishPrice);
     }
     @PermitAll
-    @GetMapping("/getHouseByRegion/{region}")
+    @GetMapping("/getHouseByRegion")
     public List<HouseResponse> findByRegion(@RequestParam Region region){
         return houseService.findByRegion(region);
     }
     @PermitAll
-    @GetMapping("/filterByHomeType/{type}")
-    public List<HouseResponse> filteByType(@RequestParam HouseType type){
+    @GetMapping("/filterByHomeType")
+    public List<HouseResponse> filterByType(@RequestParam HouseType type){
         return houseService.filterByType(type);
     }
 

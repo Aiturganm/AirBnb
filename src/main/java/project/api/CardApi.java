@@ -1,5 +1,6 @@
 package project.api;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import project.service.CardService;
 @RequestMapping("api/card")
 public class CardApi {
     private final CardService cardService;
+    @PermitAll
     @PostMapping("/save")
     public SimpleResponse saveCard(@RequestBody @Valid CardReq cardReq){
         return cardService.save(cardReq);
