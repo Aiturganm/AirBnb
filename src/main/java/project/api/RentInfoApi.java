@@ -1,9 +1,15 @@
 package project.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.Value;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
+import project.dto.request.RentRequest;
+import project.dto.response.SimpleResponse;
 import project.service.RentInfoService;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/rent-info")
@@ -11,4 +17,9 @@ import project.service.RentInfoService;
 public class RentInfoApi {
     private final RentInfoService rentInfoService;
 
+    @Secured({"USER", "VENDOR"})
+    @PostMapping("/save")
+    public SimpleResponse createRent(@RequestBody @Valid RentRequest request, Principal principal){
+        return rentInfoService.createRent(request, principal);
+    }
 }
