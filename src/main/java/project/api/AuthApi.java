@@ -11,7 +11,7 @@ import project.dto.response.RegisterResponse;
 import project.service.UserService;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthApi {
@@ -23,7 +23,7 @@ public class AuthApi {
         log.info("success saved!!!");
         return userService.signUp(signUpRequest);
     }
-    @GetMapping("signIn")
+    @GetMapping("/signIn")
     public SignResponse signIn(@RequestBody SignInRequest signInRequest){
         return userService.signIn(signInRequest);
     }

@@ -4,26 +4,23 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import project.config.jwt.JwtService;
 import project.dto.request.HouseRequest;
 import project.dto.response.HouseResponse;
 import project.dto.response.SimpleResponse;
+import project.dto.response.UserHouseResponse;
 import project.entities.House;
 import project.entities.User;
-import project.enums.Role;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import project.config.jwt.JwtService;
-import project.dto.response.UserHouseResponse;
-
 import project.enums.HouseType;
 import project.enums.Region;
-
+import project.enums.Role;
 import project.exception.NotFoundException;
 import project.repository.HouseRepository;
 import project.repository.UserRepository;
 import project.service.HouseService;
 
-import java.security.Principal;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -39,10 +36,9 @@ public class HouseServiceImpl implements HouseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-
     @PostConstruct
-    public UserResponse initUser() {
-        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role.ADMIN, true, "njdkmvscl");
+    public UserResponse initUser(){
+        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role. ADMIN, true, "njdkmvscl");
         userRepository.save(user);
         return UserResponse.builder()
                 .token(jwtService.createToken(user))
@@ -59,25 +55,25 @@ public class HouseServiceImpl implements HouseService {
         House house = new House();
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
-        house.setUser(byEmail);
+house.setUser(byEmail);
         house.setHouseType(houseRequest.getHouseType());
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
         house.setImages(houseRequest.getImages());
-        houseRepository.save(house);
         house.setPrice(houseRequest.getPrice());
         house.setGuests(houseRequest.getGuests());
         house.setNameOfHotel(houseRequest.getNameOfHotel());
         houseRepository.save(house);
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("house with name " + house.getNameOfHotel() + " successfully saved")
+                .message("house with name "+house.getNameOfHotel()+" successfully saved")
                 .build();
     }
 
     @Override
     public HouseResponse findbyId(Long houseId) {
-        House house = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
+        House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
+
         return HouseResponse.builder()
                 .id(house.getId())
                 .description(house.getDescription())
@@ -93,13 +89,10 @@ public class HouseServiceImpl implements HouseService {
     public List<HouseResponse> findAll() {
         List<House> all = houseRepository.findAll();
         List<HouseResponse> houseResponses = new ArrayList<>();
-        for (House house : all) {
-            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(),house.getDescription(),house.getImages(),house.getRoom(),house.getHouseType(),house.getPrice(),house.getGuests()));
 
-            for (House house2 : all) {
-                if (house2.isPublished()) {
-                    houseResponses.add(new HouseResponse(house2.getId(), house2.getNameOfHotel(), house2.getDescription(), house2.getImages(), house2.getRoom(), house2.getHouseType(), house2.getPrice(), house2.getGuests()));
-                }
+        for (House house : all) {
+            if (house.isPublished()) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
             }
         }
         return houseResponses;
@@ -112,10 +105,6 @@ public class HouseServiceImpl implements HouseService {
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                house1.setDescription(houseRequest.getDescription());
-                house1.setHouseType(houseRequest.getHouseType());
-                house1.setRoom(houseRequest.getRoom());
-                house1.setImages(houseRequest.getImages());
                 house.setHouseType(houseRequest.getHouseType());
                 house.setDescription(houseRequest.getDescription());
                 house.setRoom(houseRequest.getRoom());
@@ -144,8 +133,6 @@ public class HouseServiceImpl implements HouseService {
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                houseRepository.delete(house1);
-
                 houseRepository.delete(house1);
                 SimpleResponse.builder()
                         .httpStatus(HttpStatus.OK)
@@ -213,14 +200,14 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public List<HouseResponse> findByRegion(Region region) {
-        if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equals(region) || Region.NARYN.equals(region) || Region.TALAS.equals(region) || Region.JALAL_ABAD.equals(region) || Region.YSSYK_KOL.equals(region)) {
-            List<House> houses = houseRepository.findByRegion(region);
-            List<HouseResponse> houseResponses = new ArrayList<>();
-            for (House house : houses) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
-            }
-            return houseResponses;
-        }
+if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equals(region) || Region.NARYN.equals(region) || Region.TALAS.equals(region) || Region.JALAL_ABAD.equals(region) || Region.YSSYK_KOL.equals(region)) {
+    List<House> houses = houseRepository.findByRegion(region);
+    List<HouseResponse> houseResponses = new ArrayList<>();
+    for (House house : houses) {
+        houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+    }
+    return houseResponses;
+       }
         throw new NotFoundException("not found");
     }
 

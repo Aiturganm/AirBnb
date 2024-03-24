@@ -10,6 +10,6 @@ public class PriceValidator implements ConstraintValidator<PriceValidation, BigD
 
     @Override
     public boolean isValid(BigDecimal value, ConstraintValidatorContext context) {
-        return value != null && value.compareTo(BigDecimal.ZERO) >= 0;
+        return value != null && value.compareTo(BigDecimal.ZERO) > 0;
     }
 }

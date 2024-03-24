@@ -29,11 +29,7 @@ public class UserApi {
                                           @RequestParam int size){
        return userService.findAll(page,size);
     }
-    @PutMapping("/{userId}")
-    public SimpleResponse update(@PathVariable Long userId,
-                                 @RequestBody UserRequest userRequest){
-        return userService.update(userId,userRequest);
-    }
+
 
 
 }

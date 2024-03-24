@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import project.config.jwt.JwtService;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
-import project.dto.request.UserRequest;
 import project.dto.response.PaginationUserResponse;
 import project.dto.response.RegisterResponse;
 import project.dto.response.SignResponse;
@@ -20,7 +19,6 @@ import project.dto.response.UserResponse;
 import project.entities.User;
 import project.exception.AlreadyExistsException;
 import project.exception.ForbiddenException;
-import project.exception.NotFoundException;
 import project.repository.UserRepository;
 import project.service.UserService;
 
@@ -100,24 +98,6 @@ public class UserServiceImpl implements UserService {
                 .page(usersPage.getNumber() + 1)
                 .size(usersPage.getTotalPages())
                 .userResponses(userResponses)
-                .build();
-    }
-
-    @Override
-    public SimpleResponse update(Long userId, UserRequest userRequest) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id " + userId));
-        user.setFirstName(userRequest.firstName());
-        user.setLastName(userRequest.lastName());
-        user.setEmail(userRequest.email());
-        user.setPassword(passwordEncoder.encode(userRequest.password()));
-        user.setDateOfBirth(userRequest.dateOfBirth());
-        user.setRole(userRequest.role());
-        user.setBlock(userRequest.isBlock());
-        user.setPhoneNumber(userRequest.phoneNumber());
-        log.info("Success updated!!!");
-        return SimpleResponse.builder()
-                .message("Successss updated!!!")
-                .httpStatus(HttpStatus.OK)
                 .build();
     }
 }
