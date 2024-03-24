@@ -54,9 +54,15 @@ public class AddressServiceImpl implements AddressService {
     public SimpleResponse update(Long addressId,Region region ,AddressRequest addressRequest) {
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new NotFoundException("Not found address with id " + addressId));
        // addressRepository.existsByStreet(addressRequest.street());
+        boolean b = addressRepository.existsByStreet(addressRequest.street());
+        if (b){
         address.setRegion(region);
         address.setCity(addressRequest.city());
         address.setStreet(addressRequest.street());
-        return null;
+        }
+        return SimpleResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("Updated address")
+                .build();
     }
 }
