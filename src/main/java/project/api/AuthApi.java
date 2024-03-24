@@ -23,7 +23,7 @@ public class AuthApi {
         log.info("success saved!!!");
         return userService.signUp(signUpRequest);
     }
-    @GetMapping("/signIn")
+    @PutMapping("/signIn")
     public SignResponse signIn(@RequestBody SignInRequest signInRequest){
         return userService.signIn(signInRequest);
     }
