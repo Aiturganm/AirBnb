@@ -4,14 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-import project.entities.Address;
 import project.entities.House;
 import project.enums.HouseType;
 import project.enums.Region;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
@@ -42,4 +39,8 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     Page<House> popularHouses(Pageable pageable);
     @Query("select avg(s.rating) from Feedback s" )
     byte rating();
+    @Query("select s from House s join s.user u where u.id =: userId")
+    Page<House> findAllUserHouse(Long userId, Pageable pageable);
+    @Query("select s from House s")
+    Page<House> findAllHouses(Pageable pageable);
 }
