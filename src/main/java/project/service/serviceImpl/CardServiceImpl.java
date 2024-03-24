@@ -28,7 +28,7 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public SimpleResponse save(CardReq cardReq) {
-        Card exists = cardRepository.findByNumber(cardReq.getCarNumber());
+        Card exists = cardRepository.findByNumber(cardReq.getCardNumber());
         if (exists != null)
             return SimpleResponse.builder().httpStatus(HttpStatus.BAD_REQUEST).message("This card number already exists!").build();
         User user = getCurrentUser();
