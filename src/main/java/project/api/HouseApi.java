@@ -23,8 +23,8 @@ public class HouseApi {
     private final HouseService houseService;
   @PermitAll
     @PostMapping("/saveHouse")
-    public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest, Principal principal, @RequestParam HouseType houseType ) {
-        return houseService.saveHouse(houseRequest , principal, houseType);
+    public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest, Principal principal ) {
+        return houseService.saveHouse(houseRequest , principal);
     }
     @PermitAll
     @GetMapping("/getHouseById/{houseId}")
@@ -33,18 +33,18 @@ public class HouseApi {
     }
     @PermitAll
     @GetMapping("/findAllHousesPublishedHouses")
-    public List<HouseResponse> allHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
-        return houseService.findAllPublisged(page, size);
+    public List<HouseResponse> allHouses(){
+        return houseService.findAll();
     }
     @Secured("ADMIN")
     @GetMapping("/findAllHousesNotPublishedHouses")
-    public List<HouseResponse> NotAllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
-        return houseService.notPublishedHouses(page, size);
+    public List<HouseResponse> NotAllHouses(){
+        return houseService.notPublishedHouses();
     }
     @PreAuthorize("hasAnyAuthority('ADMIN', 'VENDER')")
     @PutMapping("/updateHouse/{houseId}")
-    public SimpleResponse updateHouse(@RequestBody HouseRequest houseRequest, @PathVariable Long houseId, Principal principal, @RequestParam HouseType houseType){
-        return houseService.updateHouse(houseRequest, houseId, principal,houseType);
+    public SimpleResponse updateHouse(@RequestBody HouseRequest houseRequest, @PathVariable Long houseId, Principal principal){
+        return houseService.updateHouse(houseRequest, houseId, principal);
     }
     @PreAuthorize("hasAnyAuthority('ADMIN', 'VENDER')")
     @GetMapping("/deleteHouse/{houseId}")

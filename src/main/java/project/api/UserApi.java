@@ -21,7 +21,6 @@ import project.service.UserService;
 @Slf4j
 public class UserApi {
     private final UserService userService;
-    //e
 
 
     @GetMapping("/findAll")
@@ -29,7 +28,11 @@ public class UserApi {
                                           @RequestParam int size){
        return userService.findAll(page,size);
     }
-
+    @PutMapping("/{userId}")
+    public SimpleResponse update(@PathVariable Long userId,
+                                 @RequestBody UserRequest userRequest){
+        return userService.update(userId,userRequest);
+    }
 
 
 }
