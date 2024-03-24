@@ -1,10 +1,4 @@
 package project.service;
-
-<<<<<<< HEAD
-import project.api.RegisterResponse;
-=======
-
->>>>>>> efcda8693e37c21bad618137035a5a27a6d10d21
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
 import project.dto.request.UserRequest;

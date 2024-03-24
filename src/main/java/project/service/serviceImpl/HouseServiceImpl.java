@@ -3,7 +3,6 @@ package project.service.serviceImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.task.TaskSchedulingProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import project.dto.request.HouseRequest;
@@ -12,19 +11,13 @@ import project.dto.response.SimpleResponse;
 import project.entities.House;
 import project.entities.User;
 import project.enums.Role;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import project.config.jwt.JwtService;
-import project.dto.request.HouseRequest;
-import project.dto.response.HouseResponse;
-import project.dto.response.SimpleResponse;
 import project.dto.response.UserHouseResponse;
-import project.entities.House;
-import project.entities.User;
+
 import project.enums.HouseType;
 import project.enums.Region;
-import project.enums.Role;
+
 import project.exception.NotFoundException;
 import project.repository.HouseRepository;
 import project.repository.UserRepository;
@@ -43,15 +36,9 @@ import java.util.List;
 public class HouseServiceImpl implements HouseService {
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
-
-    @Override
-    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal) {
-        String name = principal.getName();
-        User byEmail = userRepository.getByEmail(name);
-        House house = new House();
-        byEmail.getHouses().add(house);
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+
 
     @PostConstruct
     public UserResponse initUser() {
@@ -78,9 +65,6 @@ public class HouseServiceImpl implements HouseService {
         house.setRoom(houseRequest.getRoom());
         house.setImages(houseRequest.getImages());
         houseRepository.save(house);
-        return SimpleResponse.builder()
-                .httpStatus(HttpStatus.OK)
-                .message("success")
         house.setPrice(houseRequest.getPrice());
         house.setGuests(houseRequest.getGuests());
         house.setNameOfHotel(houseRequest.getNameOfHotel());
@@ -94,8 +78,6 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public HouseResponse findbyId(Long houseId) {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
-        House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
-
         return HouseResponse.builder()
                 .id(house.getId())
                 .description(house.getDescription())
@@ -112,11 +94,12 @@ public class HouseServiceImpl implements HouseService {
         List<House> all = houseRepository.findAll();
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : all) {
-            houseResponses.add(new HouseResponse(house.getId(), house.getDescription(), house.getRoom(), house.getHouseType(), house.getImages()));
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(),house.getDescription(),house.getImages(),house.getRoom(),house.getHouseType(),house.getPrice(),house.getGuests()));
 
-        for (House house : all) {
-            if (house.isPublished()) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            for (House house2 : all) {
+                if (house2.isPublished()) {
+                    houseResponses.add(new HouseResponse(house2.getId(), house2.getNameOfHotel(), house2.getDescription(), house2.getImages(), house2.getRoom(), house2.getHouseType(), house2.getPrice(), house2.getGuests()));
+                }
             }
         }
         return houseResponses;
@@ -124,7 +107,6 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal) {
-        House house1 = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
@@ -157,13 +139,12 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public SimpleResponse deleteHouse(Long houseId, Principal principal) {
-        House house1 = houseRepository.findById(houseId).orElseThrow(() -> new RuntimeException());
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-              houseRepository.delete(house1);
+                houseRepository.delete(house1);
 
                 houseRepository.delete(house1);
                 SimpleResponse.builder()
