@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import project.dto.request.AddressRequest;
 import project.dto.response.HouseResponse;
+import project.dto.response.HouseResponsesClass;
 import project.dto.response.SimpleResponse;
 import project.entities.Address;
 import project.entities.House;
@@ -44,12 +45,17 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<HouseResponse> getRegionHouses(Region region) {
-        return addressRepository.getRegionHouses(region);
-    }
+    public List<HouseResponsesClass> getRegionHouses(Region region) {
+        return addressRepository.findByRegion(region);
+       }
 
     @Override
-    public SimpleResponse update(Long addressId) {
+    public SimpleResponse update(Long addressId,Region region ,AddressRequest addressRequest) {
+        Address address = addressRepository.findById(addressId).orElseThrow(() -> new NotFoundException("Not found address with id " + addressId));
+        addressRepository.existsByStreet(addressRequest.street());
+        address.setRegion(region);
+        address.setCity(addressRequest.city());
+        address.setStreet(addressRequest.street());
         return null;
     }
 }

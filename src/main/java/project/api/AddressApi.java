@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import project.dto.request.AddressRequest;
 import project.dto.response.HouseResponse;
+import project.dto.response.HouseResponsesClass;
 import project.dto.response.SimpleResponse;
 import project.enums.Region;
 import project.service.AddressService;
@@ -22,13 +23,15 @@ public class AddressApi {
                                       @RequestBody AddressRequest addressRequest){
         return addressService.save(houseId,region,addressRequest);
     }
-    @GetMapping("/houses")
-    public List<HouseResponse> getRegionHouses(@RequestParam Region region){
+    @PutMapping("/houses")
+    public List<HouseResponsesClass> getRegionHouses(@RequestParam Region region){
         return addressService.getRegionHouses(region);
     }
 
     @PutMapping("/{addressId}")
-    public SimpleResponse update(@PathVariable Long addressId){
-        return addressService.update(addressId);
+    public SimpleResponse update(@PathVariable Long addressId,
+                                 @RequestParam Region region,
+                                 @RequestBody AddressRequest addressRequest){
+        return addressService.update(addressId,region,addressRequest);
     }
 }
