@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
     @Override
-    public RegisterResponse signUp(SignUpRequest signUpRequest) {
+    public SimpleResponse signUp(SignUpRequest signUpRequest) {
         boolean exist = userRepository.existsByEmail(signUpRequest.getEmail());
         if (exist) throw new AlreadyExistsException("Email already exists!!!");
         User user = new User();
@@ -49,16 +49,10 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setRole(signUpRequest.getRole());
         userRepository.save(user);
-
-        String token = jwtService.createToken(user);
-        return RegisterResponse.builder()
-                .token(token)
-                .simpleResponse(SimpleResponse.builder()
+        return SimpleResponse.builder()
                         .httpStatus(HttpStatus.OK)
                         .message("Success user saved!!!")
-                        .build())
-                .build();
-
+                        .build();
     }
 
     @Override
@@ -66,7 +60,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getByEmail(signInRequest.email());
         String password = user.getPassword();
         String decodePassword = signInRequest.password();
-        boolean matches = passwordEncoder.matches(decodePassword, password);
+        boolean matches = passwordEncoder.matches(decodePassword,password);
         if (!matches) {
             throw new ForbiddenException("Forbidden 403(wrong password)!");
         }

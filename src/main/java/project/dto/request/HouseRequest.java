@@ -23,8 +23,6 @@ public class HouseRequest {
     private List<String> images;
     @RoomValidation
     private byte room;
-    @NotNull
-    private HouseType houseType;
     @PriceValidation
     private BigDecimal price;
     @MinesValidation

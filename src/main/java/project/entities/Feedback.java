@@ -29,6 +29,9 @@ public class Feedback extends BaseEntity{
     @ManyToOne(cascade = {CascadeType.PERSIST})
     private House house;
 
+    public Feedback(String comm, List<String> images, byte rating) {
+    }
+
     public void addLikes(Long id){
         if(this.likes == null)  this.likes = new ArrayList<>();
         this.likes.add(id);

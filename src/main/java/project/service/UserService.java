@@ -10,7 +10,7 @@ import project.dto.response.SignResponse;
 import project.dto.response.SimpleResponse;
 
 public interface UserService {
-    RegisterResponse signUp(SignUpRequest signUpRequest);
+    SimpleResponse signUp(SignUpRequest signUpRequest);
     SignResponse signIn(SignInRequest signInRequest);
 
     PaginationUserResponse findAll(int page, int size);
