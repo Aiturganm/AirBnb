@@ -8,6 +8,7 @@ import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
 import project.dto.response.SignResponse;
 import project.dto.response.RegisterResponse;
+import project.dto.response.SimpleResponse;
 import project.service.UserService;
 
 @RestController
@@ -19,7 +20,7 @@ public class AuthApi {
 
     @Secured("ADMIN")
     @PostMapping("/save")
-    public RegisterResponse signUp(@RequestBody SignUpRequest signUpRequest){
+    public SimpleResponse signUp(@RequestBody SignUpRequest signUpRequest){
         log.info("success saved!!!");
         return userService.signUp(signUpRequest);
     }
