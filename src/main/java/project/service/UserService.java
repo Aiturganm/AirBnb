@@ -16,4 +16,6 @@ public interface UserService {
     PaginationUserResponse findAll(int page, int size);
 
     SimpleResponse update(Long userId, UserRequest userRequest);
+
+    SimpleResponse delete(Long userId);
 }

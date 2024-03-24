@@ -17,8 +17,10 @@ import project.dto.response.RegisterResponse;
 import project.dto.response.SignResponse;
 import project.dto.response.SimpleResponse;
 import project.dto.response.UserResponse;
+import project.entities.House;
 import project.entities.User;
 import project.exception.AlreadyExistsException;
+import project.exception.BadRequestException;
 import project.exception.ForbiddenException;
 import project.exception.NotFoundException;
 import project.repository.UserRepository;
@@ -98,26 +100,45 @@ public class UserServiceImpl implements UserService {
         }
         return PaginationUserResponse.builder()
                 .page(usersPage.getNumber() + 1)
-                .size(usersPage.getTotalPages())
+                .size(size)
                 .userResponses(userResponses)
                 .build();
     }
 
     @Override
     public SimpleResponse update(Long userId, UserRequest userRequest) {
-            User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id " + userId));
-            user.setFirstName(userRequest.firstName());
-            user.setLastName(userRequest.lastName());
-            user.setEmail(userRequest.email());
-            user.setPassword(passwordEncoder.encode(userRequest.password()));
-            user.setDateOfBirth(userRequest.dateOfBirth());
-            user.setRole(userRequest.role());
-            user.setBlock(userRequest.isBlock());
-            user.setPhoneNumber(userRequest.phoneNumber());
-            log.info("Success updated!!!");
+        for (User user1 : userRepository.findAll()) {
+            if (!user1.getEmail().equals(userRequest.email())) {
+                User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id " + userId));
+                user.setFirstName(userRequest.firstName());
+                user.setLastName(userRequest.lastName());
+                user.setEmail(userRequest.email());
+                user.setPassword(passwordEncoder.encode(userRequest.password()));
+                user.setDateOfBirth(userRequest.dateOfBirth());
+                user.setRole(userRequest.role());
+                user.setBlock(userRequest.isBlock());
+                user.setPhoneNumber(userRequest.phoneNumber());
+                log.info("Success updated!!!");
+            }else throw new AlreadyExistsException("This email: "+userRequest.email()+" is already exists!");
+        }
             return SimpleResponse.builder()
-                    .message("Successss updated!!!")
+                    .message("Success updated!!!")
                     .httpStatus(HttpStatus.OK)
                     .build();
+    }
+
+    @Override
+    public SimpleResponse delete(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id " + userId));
+        for (House house : user.getHouses()) {
+            if (house.isBooked()){
+                throw new BadRequestException("User's booking isn't finished!");
+            }
+        }
+        userRepository.deleteById(userId);
+        return SimpleResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("Success deleted!")
+                .build();
     }
 }
