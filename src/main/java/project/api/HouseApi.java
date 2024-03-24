@@ -35,6 +35,7 @@ public class HouseApi {
     @GetMapping("/findAllHousesPublishedHouses")
     public List<HouseResponse> allHouses(){
         return houseService.findAll();
+
     }
     @Secured("ADMIN")
     @GetMapping("/findAllHousesNotPublishedHouses")
