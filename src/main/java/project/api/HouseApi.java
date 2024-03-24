@@ -31,17 +31,17 @@ public class HouseApi {
     }
     @PermitAll
     @GetMapping("/findAllHousesPublishedHouses")
-    public PaginationResponse allHouses(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
+    public PaginationResponse findAllPublishedHouses(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
         return houseService.findAllPublisged(page,size);
     }
     @Secured("ADMIN")
     @GetMapping("/findAllHouses")
-    public PaginationResponse AllHousesAll(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+    public PaginationResponse AllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
         return houseService.allHouses(page,size);
     }
     @Secured("ADMIN")
     @GetMapping("/findAllNotPublishedHouses")
-    public PaginationResponse NotAllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+    public PaginationResponse NotPublishedAllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
         return houseService.notPublishedHouses(page,size);
     }
     @PreAuthorize("hasAnyAuthority('ADMIN', 'VENDER')")

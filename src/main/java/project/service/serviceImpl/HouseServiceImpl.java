@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.config.jwt.JwtService;
 import project.dto.request.HouseRequest;
 import project.dto.response.*;
@@ -27,6 +28,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,15 +85,13 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public HouseResponse findbyId(Long houseId) {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
-        byte rating = houseRepository.rating();
-
         return HouseResponse.builder()
                 .id(house.getId())
                 .description(house.getDescription())
                 .houseType(house.getHouseType())
                 .images(house.getImages())
                 .room(house.getRoom())
-                .rating(rating)
+                .rating(house.getRating())
                 .guests(house.getGuests())
                 .price(house.getPrice())
                 .build();
@@ -102,28 +102,25 @@ public class HouseServiceImpl implements HouseService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.findAllPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
-
         for (House house : allPublished) {
             if (house.isPublished()) {
-                byte rating = houseRepository.rating();
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
         }
-      return   PaginationResponse.builder()
+        return PaginationResponse.builder()
                 .page(allPublished.getNumber() + 1)
                 .size(allPublished.getTotalPages())
                 .houseResponseList(houseResponses)
                 .build();
     }
 
-    @Override
+    @Override  @Transactional
     public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType) {
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                house.setHouseType(houseType);
                 house.setDescription(houseRequest.getDescription());
                 house.setRoom(houseRequest.getRoom());
                 house.setImages(houseRequest.getImages());
@@ -151,8 +148,9 @@ public class HouseServiceImpl implements HouseService {
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
+             house.getUser().setHouses(null);
                 houseRepository.delete(house1);
-                SimpleResponse.builder()
+               return SimpleResponse.builder()
                         .httpStatus(HttpStatus.OK)
                         .message("success deleted")
                         .build();
@@ -168,13 +166,11 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public HouseResponse findByName(String houseName) {
         House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new NotFoundException("house not found"));
-        byte rating = houseRepository.rating();
         return HouseResponse.builder()
-
                 .id(house.getId())
                 .description(house.getDescription())
                 .houseType(house.getHouseType())
-                .rating(rating)
+                .rating(house.getRating())
                 .images(house.getImages())
                 .room(house.getRoom())
                 .build();
@@ -183,19 +179,16 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public PagiUserHouse findByUserId(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-         List<UserHouseResponse> userHouseResponses = new ArrayList<>();
-        Page<House> houses = houseRepository.findAllUserHouse(userId,pageable );
+        List<UserHouseResponse> userHouseResponses = new ArrayList<>();
+        Page<House> houses = houseRepository.findAllUserHouse(userId, pageable);
         for (House house : houses) {
-
             userHouseResponses.add(new UserHouseResponse(house.getUser().getFirstName(), house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
-
         }
-      return   PagiUserHouse.builder()
+        return PagiUserHouse.builder()
                 .page(houses.getNumber() + 1)
                 .size(houses.getTotalPages())
                 .houseResponseList(userHouseResponses)
                 .build();
-
 
 
     }
@@ -203,61 +196,58 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public PaginationResponse sortByPrice(String ascOrDesc, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        byte rating = houseRepository.rating();
-
         List<HouseResponse> houseResponses = new ArrayList<>();
         if (ascOrDesc.equalsIgnoreCase("asc")) {
-            Page<House> houseAsc = houseRepository.sortAsc(pageable, "asc");
+            Page<House> houseAsc = houseRepository.sortAsc(pageable);
             for (House house : houseAsc) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
-                return   PaginationResponse.builder()
-                        .page(houseAsc.getNumber() + 1)
-                        .size(houseAsc.getTotalPages())
-                        .houseResponseList(houseResponses)
-                        .build();
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
+            return PaginationResponse.builder()
+                    .page(houseAsc.getNumber() + 1)
+                    .size(houseAsc.getTotalPages())
+                    .houseResponseList(houseResponses).build();
         } else if (ascOrDesc.equalsIgnoreCase("desc")) {
-            Page<House> houseDesc = houseRepository.sortDesc(pageable, "desc");
+            Page<House> houseDesc = houseRepository.sortDesc(pageable);
             for (House house : houseDesc) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
-                return   PaginationResponse.builder()
-                        .page(houseDesc.getNumber() + 1)
-                        .size(houseDesc.getTotalPages())
-                        .houseResponseList(houseResponses)
-                        .build();
-
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
+            return PaginationResponse.builder()
+                    .page(houseDesc.getNumber() + 1)
+                    .size(houseDesc.getTotalPages())
+                    .houseResponseList(houseResponses)
+                    .build();
+        } else {
+            throw new NotFoundException("enter asc or desc");
         }
-        throw new NotFoundException("not found");
     }
+
 
     @Override
     public PaginationResponse betweenPrice(BigDecimal startPrice, BigDecimal finishPrice, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        byte rating = houseRepository.rating();
+
         Page<House> houses = houseRepository.betweenPrice(pageable, startPrice, finishPrice);
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : houses) {
-            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
         }
-        return   PaginationResponse.builder()
+        return PaginationResponse.builder()
                 .page(houses.getNumber() + 1)
                 .size(houses.getTotalPages())
-                .houseResponseList(houseResponses)
-                .build();
+                .houseResponseList(houseResponses).build();
     }
+
 
     @Override
     public PaginationResponse findByRegion(Region region, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        byte rating = houseRepository.rating();
         if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equals(region) || Region.NARYN.equals(region) || Region.TALAS.equals(region) || Region.JALAL_ABAD.equals(region) || Region.YSSYK_KOL.equals(region)) {
             Page<House> houses = houseRepository.findByRegion(pageable, region);
             List<HouseResponse> houseResponses = new ArrayList<>();
             for (House house : houses) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
-          return   PaginationResponse.builder()
+            return PaginationResponse.builder()
                     .page(houses.getNumber() + 1)
                     .size(houses.getTotalPages())
                     .houseResponseList(houseResponses)
@@ -269,36 +259,19 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public PaginationResponse filterByType(HouseType type, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        byte rating = houseRepository.rating();
-        if (HouseType.HOUSE.equals(type)) {
-            Page<House> houses = houseRepository.findAllPublished(pageable);
-            List<HouseResponse> houseResponses = new ArrayList<>();
-            for (House house : houses) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
-
-            }
-          return   PaginationResponse.builder()
-                    .page(houses.getNumber() + 1)
-                    .size(houses.getTotalPages())
-                    .houseResponseList(houseResponses)
-                    .build();
-        } else if (HouseType.APARTMENT.equals(type)) {
-            Page<House> houses = houseRepository.filterByType(pageable, type);
-            List<HouseResponse> houseResponses = new ArrayList<>();
-            for (House house : houses) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
-
-            }
-          return   PaginationResponse.builder()
-                    .page(houses.getNumber() + 1)
-                    .size(houses.getTotalPages())
-                    .houseResponseList(houseResponses)
-                    .build();
-
+        Page<House> houses = houseRepository.filterByType(type, pageable);
+        List<HouseResponse> houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
         }
 
-        throw new NotFoundException("not found");
+        return PaginationResponse.builder()
+                .page(houses.getNumber() + 1)
+                .size(houses.getTotalPages())
+                .houseResponseList(houseResponses)
+                .build();
     }
+
 
     @Override
     public PaginationResponse notPublishedHouses(int page, int size) {
@@ -308,10 +281,11 @@ public class HouseServiceImpl implements HouseService {
         byte rating = houseRepository.rating();
         for (House house : allPublished) {
             if (!house.isPublished()) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
+                house.setRating(rating);
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
         }
-      return   PaginationResponse.builder()
+        return PaginationResponse.builder()
                 .page(allPublished.getNumber() + 1)
                 .size(allPublished.getTotalPages())
                 .houseResponseList(houseResponses)
@@ -323,13 +297,12 @@ public class HouseServiceImpl implements HouseService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.popularHouses(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
-        byte rating = houseRepository.rating();
         for (House house : allPublished) {
             if (!house.isPublished()) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
         }
-      return   PaginationResponse.builder()
+        return PaginationResponse.builder()
                 .page(allPublished.getNumber() + 1)
                 .size(allPublished.getTotalPages())
                 .houseResponseList(houseResponses)
@@ -341,10 +314,9 @@ public class HouseServiceImpl implements HouseService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> all = houseRepository.findAllHouses(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
-        for (House house :all ) {
+        for (House house : all) {
             if (house.isPublished()) {
-                byte rating = houseRepository.rating();
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), rating, house.getGuests()));
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
         }
         return PaginationResponse.builder()
