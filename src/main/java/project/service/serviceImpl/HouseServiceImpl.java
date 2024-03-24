@@ -37,8 +37,8 @@ public class HouseServiceImpl implements HouseService {
     private final JwtService jwtService;
 
     @PostConstruct
-    public UserResponse initUser(){
-        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role. ADMIN, true, "njdkmvscl");
+    public UserResponse initUser() {
+        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role.ADMIN, true, "njdkmvscl");
         userRepository.save(user);
         return UserResponse.builder()
                 .token(jwtService.createToken(user))
@@ -55,7 +55,7 @@ public class HouseServiceImpl implements HouseService {
         House house = new House();
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
-house.setUser(byEmail);
+        house.setUser(byEmail);
         house.setHouseType(houseRequest.getHouseType());
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
@@ -66,7 +66,7 @@ house.setUser(byEmail);
         houseRepository.save(house);
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
-                .message("house with name "+house.getNameOfHotel()+" successfully saved")
+                .message("house with name " + house.getNameOfHotel() + " successfully saved")
                 .build();
     }
 
@@ -200,14 +200,14 @@ house.setUser(byEmail);
 
     @Override
     public List<HouseResponse> findByRegion(Region region) {
-if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equals(region) || Region.NARYN.equals(region) || Region.TALAS.equals(region) || Region.JALAL_ABAD.equals(region) || Region.YSSYK_KOL.equals(region)) {
-    List<House> houses = houseRepository.findByRegion(region);
-    List<HouseResponse> houseResponses = new ArrayList<>();
-    for (House house : houses) {
-        houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
-    }
-    return houseResponses;
-       }
+        if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equals(region) || Region.NARYN.equals(region) || Region.TALAS.equals(region) || Region.JALAL_ABAD.equals(region) || Region.YSSYK_KOL.equals(region)) {
+            List<House> houses = houseRepository.findByRegion(region);
+            List<HouseResponse> houseResponses = new ArrayList<>();
+            for (House house : houses) {
+                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
+            }
+            return houseResponses;
+        }
         throw new NotFoundException("not found");
     }
 
