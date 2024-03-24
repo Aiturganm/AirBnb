@@ -28,7 +28,7 @@ public class FeedBackApi {
     Long houseId) {
         return feedBackService.saveFeedBack(feedBackRequest, principal, houseId);
     }
-    @GetMapping("/getFeedBackById{feedId}")
+    @GetMapping("/getFeedBackById/{feedId}")
     public FeedBackResponse getFeedback(@PathVariable Long feedId) {
         return feedBackService.getFeedBack(feedId);
     }
@@ -40,8 +40,8 @@ public class FeedBackApi {
 
 
     @DeleteMapping("/deleteFeedBack/{feedId}")
-    public SimpleResponse delete(@PathVariable Long feedId) {
-        return feedBackService.delete(feedId);
+    public SimpleResponse delete(@PathVariable Long feedId, Principal principal) {
+        return feedBackService.delete(feedId, principal);
     }
 
 }

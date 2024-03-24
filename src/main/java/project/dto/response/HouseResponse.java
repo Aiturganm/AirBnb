@@ -12,20 +12,16 @@ import project.enums.HouseType;
 import java.math.BigDecimal;
 import java.util.List;
 
-
 @Builder
 public record HouseResponse (
         Long id,
         String nameOfHotel,
         String description,
-        @ElementCollection
-         List<String> images,
-         byte room,
-        @Enumerated(EnumType.STRING)
-         HouseType houseType,
-         BigDecimal price,
-         byte rating,
-         int guests
+        List<String> images,
+        byte room,
+        HouseType houseType,
+        BigDecimal price,
+        byte rating,
+        int guests
+) {}
 
-                ){
-}

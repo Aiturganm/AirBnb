@@ -14,5 +14,5 @@ import java.util.List;
 public class FeedBackResponse {
     String comm;
     private byte rating;
-    String message;
+
 }

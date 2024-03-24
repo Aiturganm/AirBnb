@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.request.FeedBackRequest;
 import project.dto.response.FeedBackResponse;
 import project.dto.response.SimpleResponse;
 import project.entities.Feedback;
 import project.entities.House;
 import project.entities.User;
+import project.enums.Role;
 import project.exception.NotFoundException;
 import project.repository.FeedBackRepository;
 import project.repository.HouseRepository;
@@ -45,17 +47,51 @@ public class FeedBackServiceImpl implements FeedBackService {
     }
 
     @Override
-    public SimpleResponse delete(Long feedId) {
-        return null;
+    public SimpleResponse delete(Long feedId, Principal principal) {
+        String name = principal.getName();
+        User byEmail = userRepository.getByEmail(name);
+
+        Feedback feedback = feedBackRepository.findById(feedId).orElseThrow(() -> new NotFoundException("feed not found"));
+        if (feedback.getUser().getId() == byEmail.getId() || byEmail.getRole().equals(Role.ADMIN)) {
+            feedBackRepository.delete(feedback);
+            return SimpleResponse.builder()
+                    .httpStatus(HttpStatus.OK)
+                    .message("feedBack success deleted")
+                    .build();
+        }
+        return SimpleResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("you cant delete this fred back")
+                .build();
     }
 
     @Override
     public FeedBackResponse getFeedBack(Long feedId) {
-        return null;
+        Feedback feedback = feedBackRepository.findById(feedId).orElseThrow(() -> new NotFoundException("feed not found"));
+        FeedBackResponse feedBackResponse = new FeedBackResponse(feedback.getComment(), feedback.getRating());
+        return feedBackResponse;
     }
 
-    @Override
+    @Override  @Transactional
     public SimpleResponse updateFeed(FeedBackRequest feedBackRequest, Long feedId, Principal principal) {
-        return null;
+        String name = principal.getName();
+        User byEmail = userRepository.getByEmail(name);
+        Feedback feedback = feedBackRepository.findById(feedId).orElseThrow(() -> new NotFoundException("feed not found"));
+        if (feedback.getUser().getId() == byEmail.getId() || byEmail.getRole().equals(Role.ADMIN)) {
+
+            feedback.setComment(feedBackRequest.getComm());
+            feedback.setRating(feedBackRequest.getRating());
+            feedback.setImages(feedBackRequest.getImages());
+            feedBackRepository.save(feedback);
+            return SimpleResponse.builder()
+                    .httpStatus(HttpStatus.OK)
+                    .message("success updated")
+                    .build();
+
+        }
+        return SimpleResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("you cant updated")
+                .build();
     }
 }
