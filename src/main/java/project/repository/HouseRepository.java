@@ -1,5 +1,7 @@
 package project.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import project.entities.Address;
@@ -30,5 +32,8 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     @Query("select s from House s where s.houseType = :type")
     List<House> filterByType(HouseType type);
 
-
+    @Query("select s from House s where s.isPublished = TRUE")
+    Page<House> findAllPublished(Pageable pageable);
+    @Query("select s from House s where s.isPublished = FALSE")
+    Page<House> FindAllNotPublished(Pageable pageable);
 }

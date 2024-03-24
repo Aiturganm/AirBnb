@@ -3,6 +3,9 @@ package project.service.serviceImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,13 +54,13 @@ public class HouseServiceImpl implements HouseService {
 
 
     @Override
-    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal) {
+    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType) {
         House house = new House();
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
 house.setUser(byEmail);
 byEmail.getHouses().add(house);
-        house.setHouseType(houseRequest.getHouseType());
+        house.setHouseType(houseType);
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
         house.setImages(houseRequest.getImages());
@@ -87,11 +90,12 @@ byEmail.getHouses().add(house);
     }
 
     @Override
-    public List<HouseResponse> findAll() {
-        List<House> all = houseRepository.findAll();
+    public List<HouseResponse> findAllPublisged(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<House> allPublished = houseRepository.findAllPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
 
-        for (House house : all) {
+        for (House house : allPublished) {
             if (house.isPublished()) {
                 houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
             }
@@ -100,13 +104,13 @@ byEmail.getHouses().add(house);
     }
 
     @Override
-    public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal) {
+    public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType) {
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                house.setHouseType(houseRequest.getHouseType());
+                house.setHouseType(houseType);
                 house.setDescription(houseRequest.getDescription());
                 house.setRoom(houseRequest.getRoom());
                 house.setImages(houseRequest.getImages());
@@ -237,11 +241,12 @@ if (Region.OSH.equals(region) || Region.CHYI.equals(region) || Region.BATKEN.equ
     }
 
     @Override
-    public List<HouseResponse> notPublishedHouses() {
-        List<House> all = houseRepository.findAll();
+    public List<HouseResponse> notPublishedHouses(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<House> allPublished = houseRepository.FindAllNotPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
 
-        for (House house : all) {
+        for (House house : allPublished) {
             if (!house.isPublished()) {
                 houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
             }

@@ -13,13 +13,13 @@ import java.security.Principal;
 import java.util.List;
 
 public interface HouseService {
-    SimpleResponse saveHouse(HouseRequest houseRequest,Principal principal);
+    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType);
 
     HouseResponse findbyId(Long houseId);
 
-    List<HouseResponse> findAll();
+    List<HouseResponse> findAllPublisged(int page, int size);
 
-    SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal);
+    SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType);
 
     SimpleResponse deleteHouse(Long houseId, Principal principal);
 
@@ -35,5 +35,5 @@ public interface HouseService {
 
     List<HouseResponse> filterByType(HouseType type);
 
-    List<HouseResponse> notPublishedHouses();
+    List<HouseResponse> notPublishedHouses(int page, int size);
 }
