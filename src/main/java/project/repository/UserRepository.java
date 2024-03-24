@@ -15,6 +15,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User getByEmail(String email);
     @Query("select case when count(u)>0 then true else false end from User u where u.email like :email")
     boolean existsByEmail(String email);
-    @Query("SELECT u FROM User u WHERE u.restaurant.id IS NULL")
-    List<User> findAllRequest();
 }
