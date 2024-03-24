@@ -30,18 +30,12 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(request -> {
             request
-                    .requestMatchers(
-                            "/api/auth/**",
-                            "/swagger-ui/index.html/**"
-                    )
-                    .permitAll()
-                    .anyRequest()
-                    .permitAll()
-            ;
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .anyRequest().permitAll();
         });
         http.csrf(AbstractHttpConfigurer::disable);
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-//        http.httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 

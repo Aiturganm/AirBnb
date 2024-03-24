@@ -14,7 +14,6 @@ import project.service.CardService;
 @RequestMapping("api/card")
 public class CardApi {
     private final CardService cardService;
-    @PermitAll
     @PostMapping("/save")
     public SimpleResponse saveCard(@RequestBody @Valid CardReq cardReq){
         return cardService.save(cardReq);
