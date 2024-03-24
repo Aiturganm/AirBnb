@@ -18,7 +18,6 @@ import project.service.UserService;
 public class AuthApi {
     private final UserService userService;
 
-    @Secured("ADMIN")
     @PostMapping("/save")
     public SimpleResponse signUp(@RequestBody SignUpRequest signUpRequest){
         log.info("success saved!!!");
