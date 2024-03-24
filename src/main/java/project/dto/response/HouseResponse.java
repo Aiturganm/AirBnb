@@ -24,6 +24,7 @@ public record HouseResponse (
         @Enumerated(EnumType.STRING)
          HouseType houseType,
          BigDecimal price,
+         byte rating,
          int guests
 
                 ){

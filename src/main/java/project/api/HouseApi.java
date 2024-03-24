@@ -23,8 +23,8 @@ public class HouseApi {
     private final HouseService houseService;
   @PermitAll
     @PostMapping("/saveHouse")
-    public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest, Principal principal ) {
-        return houseService.saveHouse(houseRequest , principal);
+    public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest, Principal principal, @RequestParam HouseType houseType ) {
+        return houseService.saveHouse(houseRequest , principal, houseType);
     }
     @PermitAll
     @GetMapping("/getHouseById/{houseId}")
@@ -33,18 +33,18 @@ public class HouseApi {
     }
     @PermitAll
     @GetMapping("/findAllHousesPublishedHouses")
-    public List<HouseResponse> allHouses(){
-        return houseService.findAll();
+    public List<HouseResponse> allHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.findAllPublisged(page,size);
     }
     @Secured("ADMIN")
     @GetMapping("/findAllHousesNotPublishedHouses")
-    public List<HouseResponse> NotAllHouses(){
-        return houseService.notPublishedHouses();
+    public List<HouseResponse> NotAllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.notPublishedHouses(page,size);
     }
     @PreAuthorize("hasAnyAuthority('ADMIN', 'VENDER')")
     @PutMapping("/updateHouse/{houseId}")
-    public SimpleResponse updateHouse(@RequestBody HouseRequest houseRequest, @PathVariable Long houseId, Principal principal){
-        return houseService.updateHouse(houseRequest, houseId, principal);
+    public SimpleResponse updateHouse(@RequestBody HouseRequest houseRequest, @PathVariable Long houseId, Principal principal, @RequestParam HouseType houseType){
+        return houseService.updateHouse(houseRequest, houseId, principal,houseType);
     }
     @PreAuthorize("hasAnyAuthority('ADMIN', 'VENDER')")
     @GetMapping("/deleteHouse/{houseId}")
@@ -63,23 +63,28 @@ public class HouseApi {
     }
     @PermitAll
     @GetMapping("/sortByPrice")
-    public List<HouseResponse> sortByPrice(@RequestParam String ascOrDesc){
-        return houseService.sortByPrice(ascOrDesc);
+    public List<HouseResponse> sortByPrice(@RequestParam String ascOrDesc,@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.sortByPrice(ascOrDesc,page,size);
     }
     @PermitAll
     @GetMapping("/sortByBetweenPrice/{startPrice}/{FinishPrice}")
-    public List<HouseResponse> betweenPrice(@PathVariable BigDecimal startPrice, @PathVariable BigDecimal FinishPrice){
-        return houseService.betweenPrice(startPrice, FinishPrice);
+    public List<HouseResponse> betweenPrice(@PathVariable BigDecimal startPrice, @PathVariable BigDecimal FinishPrice,@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.betweenPrice(startPrice, FinishPrice,page,size);
     }
     @PermitAll
     @GetMapping("/getHouseByRegion")
-    public List<HouseResponse> findByRegion(@RequestParam Region region){
-        return houseService.findByRegion(region);
+    public List<HouseResponse> findByRegion(@RequestParam Region region,@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.findByRegion(region,page,size);
     }
     @PermitAll
     @GetMapping("/filterByHomeType")
-    public List<HouseResponse> filterByType(@RequestParam HouseType type){
-        return houseService.filterByType(type);
+    public List<HouseResponse> filterByType(@RequestParam HouseType type,@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.filterByType(type,page,size);
+    }
+    @PermitAll
+    @GetMapping("/findPopular")
+    public List<HouseResponse> popularsHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.popularHouses(page,size);
     }
 
 }
