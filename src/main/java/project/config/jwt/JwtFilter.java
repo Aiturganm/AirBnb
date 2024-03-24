@@ -1,5 +1,4 @@
 package project.config.jwt;
-
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

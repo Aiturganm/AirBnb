@@ -19,6 +19,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SequenceGenerator(name = "user_gen",allocationSize = 1)
+public class User  extends BaseEntity implements UserDetails{
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private LocalDate dateOfBirth;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    private boolean isBlock;
+    private String phoneNumber;
 public class User extends BaseEntity implements UserDetails {
         private String firstName;
         private String lastName;
