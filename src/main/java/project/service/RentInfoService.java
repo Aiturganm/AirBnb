@@ -1,4 +1,6 @@
 package project.service;
 
-public interface RentInfoService {
+import project.repository.RentInfoRepository;
+
+public interface RentInfoService{
 }

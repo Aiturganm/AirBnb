@@ -2,6 +2,7 @@ package project.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import project.entities.Address;
 import project.entities.Card;
 
