@@ -51,7 +51,7 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     @Query("select avg(s.rating) from Feedback s")
     byte rating();
 
-    @Query("select s from House s join s.user u where u.id =: userId")
+    @Query("select s from House s join s.user u where u.id =:userId")
     Page<House> findAllUserHouse(Long userId, Pageable pageable);
 
     @Query("select s from House s")
