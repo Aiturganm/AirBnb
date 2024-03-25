@@ -38,20 +38,6 @@ public class HouseServiceImpl implements HouseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    @PostConstruct
-    public UserResponse initUser() {
-        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role.ADMIN, true, "njdkmvscl");
-        userRepository.save(user);
-        return UserResponse.builder()
-                .token(jwtService.createToken(user))
-                .email(user.getEmail())
-                .role(user.getRole())
-                .httpStatus(HttpStatus.OK)
-
-                .build();
-    }
-
-
     @Override
     public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType) {
         House house = new House();
@@ -117,6 +103,7 @@ public class HouseServiceImpl implements HouseService {
     @Transactional
     public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType) {
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
+        log.info(String.valueOf(house1.getId()));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
@@ -141,7 +128,7 @@ public class HouseServiceImpl implements HouseService {
                 .build();
     }
 
-    @Override
+    @Override @Transactional
     public SimpleResponse deleteHouse(Long houseId, Principal principal) {
         House house = houseRepository.findById(houseId)
                 .orElseThrow(() -> new NotFoundException("House not found"));
@@ -162,9 +149,10 @@ public class HouseServiceImpl implements HouseService {
                     .httpStatus(HttpStatus.MULTI_STATUS)
                     .message("You cannot delete this house")
                     .build();
-        }
 
-    }
+            }
+
+        }
 
     @Override
     public HouseResponse findByName(String houseName) {
@@ -182,21 +170,20 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public PagiUserHouse findByUserId(Long userId, int page, int size) {
+        log.info(String.valueOf(userId));
         Pageable pageable = PageRequest.of(page - 1, size);
         List<UserHouseResponse> userHouseResponses = new ArrayList<>();
-
-        // Call the repository method to find houses by user ID
         Page<House> houses = houseRepository.findAllUserHouse(userId, pageable);
-
         for (House house : houses) {
             userHouseResponses.add(new UserHouseResponse(house.getUser().getFirstName(), house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
         }
-
         return PagiUserHouse.builder()
                 .page(houses.getNumber() + 1)
                 .size(houses.getTotalPages())
                 .houseResponseList(userHouseResponses)
                 .build();
+
+
     }
 
     @Override
@@ -320,8 +307,6 @@ public class HouseServiceImpl implements HouseService {
         for (House house : all) {
 
             houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
-
-
         }
         return PaginationResponse.builder()
                 .page(all.getNumber() + 1)
