@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.config.jwt.JwtService;
 import project.dto.request.HouseRequest;
 import project.dto.response.*;
+import project.entities.Feedback;
 import project.entities.House;
 import project.entities.User;
 import project.enums.HouseType;
@@ -82,9 +83,13 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public HouseResponse findbyId(Long houseId) {
+    public HouseFeedBackResponse findbyId(Long houseId) {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
-        return HouseResponse.builder()
+        List<FeedBackResponse>feedBackResponses = new ArrayList<>();
+        for (Feedback feedback : house.getFeedbacks()) {
+            feedBackResponses.add(new FeedBackResponse(feedback.getComment(), feedback.getRating()));
+        }
+        return HouseFeedBackResponse.builder()
                 .id(house.getId())
                 .nameOfHotel(house.getNameOfHotel())
                 .description(house.getDescription())
@@ -94,11 +99,12 @@ public class HouseServiceImpl implements HouseService {
                 .rating(house.getRating())
                 .guests(house.getGuests())
                 .price(house.getPrice())
+                .feedBackResponses(feedBackResponses)
                 .build();
     }
 
     @Override
-    public PaginationResponse findAllPublisged(int page, int size) {
+    public PaginationResponse findAllPublished(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.findAllPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
@@ -149,13 +155,8 @@ public class HouseServiceImpl implements HouseService {
 
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
-
-
         if (user.getRole().equals(Role.ADMIN) || user.getHouses().stream().anyMatch(userHouse -> userHouse.getId().equals(house.getId()))) {
-
             user.getHouses().removeIf(userHouse -> userHouse.getId().equals(house.getId()));
-
-
             houseRepository.deleteById(house.getId());
 
             return SimpleResponse.builder()
