@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import project.dto.request.AddressRequest;
-import project.dto.response.HouseResponse;
 import project.dto.response.HouseResponsesClass;
 import project.dto.response.SimpleResponse;
 import project.entities.Address;
@@ -36,6 +35,8 @@ public class AddressServiceImpl implements AddressService {
                 address.setCity(addressRequest.city());
                 address.setStreet(addressRequest.street());
                 address.setHouse(house);
+                address.setHouse(house);
+                addressRepository.save(address);
             }else throw new AlreadyExistsException("Street must be unique!");
         }
         return SimpleResponse.builder()

@@ -28,7 +28,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +117,7 @@ public class HouseServiceImpl implements HouseService {
                 houseRepository.save(house1);
                 return SimpleResponse.builder()
                         .httpStatus(HttpStatus.OK)
-                        .message("house with id " + house1.getHouseType() + " successfully updated")
+                        .message("house with id " + house1.getNameOfHotel() + " successfully updated")
                         .build();
 
             }
@@ -131,9 +130,25 @@ public class HouseServiceImpl implements HouseService {
 
     @Override @Transactional
     public SimpleResponse deleteHouse(Long houseId, Principal principal) {
-        House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
+        House house = houseRepository.findById(houseId)
+                .orElseThrow(() -> new NotFoundException("House not found"));
+
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
+      
+        if (user.getRole().equals(Role.ADMIN) || user.getHouses().stream().anyMatch(userHouse -> userHouse.getId().equals(house.getId()))) {
+            user.getHouses().removeIf(userHouse -> userHouse.getId().equals(house.getId()));
+            houseRepository.deleteById(house.getId());
+
+            return SimpleResponse.builder()
+                    .httpStatus(HttpStatus.OK)
+                    .message("Success: House deleted")
+                    .build();
+        } else {
+            return SimpleResponse.builder()
+                    .httpStatus(HttpStatus.MULTI_STATUS)
+                    .message("You cannot delete this house")
+                    .build();
         for (House house : user.getHouses()) {
             log.info("FOR HOUSE ID CHECK: "  + house.getId());
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
@@ -146,10 +161,6 @@ public class HouseServiceImpl implements HouseService {
             }
         }
 
-        return SimpleResponse.builder()
-                .httpStatus(HttpStatus.MULTI_STATUS)
-                .message("you can not delete this house")
-                .build();
     }
 
     @Override
@@ -157,6 +168,7 @@ public class HouseServiceImpl implements HouseService {
         House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new NotFoundException("house not found"));
         return HouseResponse.builder()
                 .id(house.getId())
+                .nameOfHotel(house.getNameOfHotel())
                 .description(house.getDescription())
                 .houseType(house.getHouseType())
                 .rating(house.getRating())
@@ -215,7 +227,6 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public PaginationResponse betweenPrice(BigDecimal startPrice, BigDecimal finishPrice, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-
         Page<House> houses = houseRepository.betweenPrice(pageable, startPrice, finishPrice);
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : houses) {
@@ -306,14 +317,16 @@ public class HouseServiceImpl implements HouseService {
         Page<House> all = houseRepository.findAllHouses(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : all) {
-            if (house.isPublished()) {
-                houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
-            }
+
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
+
+
         }
         return PaginationResponse.builder()
                 .page(all.getNumber() + 1)
                 .size(all.getTotalPages())
                 .houseResponseList(houseResponses)
                 .build();
+
     }
 }
