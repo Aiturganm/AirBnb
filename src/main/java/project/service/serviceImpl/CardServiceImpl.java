@@ -11,6 +11,7 @@ import project.dto.response.CardRes;
 import project.dto.response.SimpleResponse;
 import project.entities.Card;
 import project.entities.User;
+import project.exception.BadRequestException;
 import project.exception.NotFoundException;
 import project.repository.CardRepository;
 import project.repository.UserRepository;
@@ -32,6 +33,8 @@ public class CardServiceImpl implements CardService {
         if (exists != null)
             return SimpleResponse.builder().httpStatus(HttpStatus.BAD_REQUEST).message("This card number already exists!").build();
         User user = getCurrentUser();
+        if (user.getCard() != null)
+            return SimpleResponse.builder().httpStatus(HttpStatus.CONFLICT).message("YOU HAVE CARD!").build();
         Card card = cardReq.convert();
         cardRepository.save(card);
         card.setUser(user);
@@ -42,21 +45,30 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public CardRes getMyCard() {
-        return getCurrentUser().getCard().convert();
+        Card card = getCurrentUser().getCard();
+        if (card==null){
+            throw new BadRequestException("You no have card!");
+        }
+        return card.convert();
     }
 
     @Override
+    @Transactional
     public SimpleResponse update(BigDecimal money) {
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Card currentUserCurd = cardRepository.findByUserEmail(currentUserEmail);
-        currentUserCurd.setMoney(money);
+        currentUserCurd.setMoney(currentUserCurd.getMoney().add(money));
         return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success added money: " + money).build();
     }
 
     @Override
+    @Transactional
     public SimpleResponse delete() {
         User currentUser = getCurrentUser();
-        cardRepository.delete(currentUser.getCard());
+        Card card = cardRepository.findByUserEmail(currentUser.getEmail());
+        card.setUser(null);
+        currentUser.setCard(null);
+        cardRepository.delete(card);
         return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted your card!").build();
     }
 

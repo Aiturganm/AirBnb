@@ -55,7 +55,7 @@ public class User extends BaseEntity implements UserDetails {
     //Relations
     @OneToOne
     private Card card;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<House> houses = new ArrayList<>();
 
 
