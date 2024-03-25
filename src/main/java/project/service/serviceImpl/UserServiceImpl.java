@@ -49,8 +49,8 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
         user.setEmail(signUpRequest.getEmail());
-
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setPhoneNumber(signUpRequest.getPhoneNumber());
         user.setRole(signUpRequest.getRole());
         userRepository.save(user);
         return SimpleResponse.builder()
@@ -143,6 +143,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse findById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found User with id " + userId));
+//        User user = userRepository.getReferenceById(userId);
         return UserResponse.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -153,5 +154,6 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
+
 
 }
