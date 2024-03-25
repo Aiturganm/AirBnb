@@ -259,6 +259,8 @@ public class HouseServiceImpl implements HouseService {
         throw new NotFoundException("not found");
     }
 
+
+
     @Override
     public PaginationResponse filterByType(HouseType type, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
