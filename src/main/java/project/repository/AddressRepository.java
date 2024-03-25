@@ -18,4 +18,5 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     List<HouseResponsesClass> findByRegion(@Param("region") Region region);
 
     boolean existsByStreet(String street);
+
 }
