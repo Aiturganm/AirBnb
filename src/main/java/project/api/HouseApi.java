@@ -13,7 +13,6 @@ import project.service.HouseService;
 
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/house")
@@ -30,14 +29,14 @@ public class HouseApi {
 
     @PermitAll
     @GetMapping("/getHouseById/{houseId}")
-    public HouseResponse findById(@PathVariable Long houseId) {
+    public HouseFeedBackResponse findById(@PathVariable Long houseId) {
         return houseService.findbyId(houseId);
     }
 
     @PermitAll
     @GetMapping("/findAllHousesPublishedHouses")
     public PaginationResponse findAllPublishedHouses(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
-        return houseService.findAllPublisged(page,size);
+        return houseService.findAllPublished(page,size);
     }
     @Secured("ADMIN")
     @GetMapping("/findAllHouses")
