@@ -86,6 +86,7 @@ public class HouseServiceImpl implements HouseService {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
         return HouseResponse.builder()
                 .id(house.getId())
+                .nameOfHotel(house.getNameOfHotel())
                 .description(house.getDescription())
                 .houseType(house.getHouseType())
                 .images(house.getImages())
@@ -193,10 +194,7 @@ public class HouseServiceImpl implements HouseService {
                 .size(houses.getTotalPages())
                 .houseResponseList(userHouseResponses)
                 .build();
-
-
     }
-
     @Override
     public PaginationResponse sortByPrice(String ascOrDesc, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -283,10 +281,8 @@ public class HouseServiceImpl implements HouseService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.FindAllNotPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
-        byte rating = houseRepository.rating();
         for (House house : allPublished) {
             if (!house.isPublished()) {
-                house.setRating(rating);
                 houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
         }
