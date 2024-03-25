@@ -21,7 +21,7 @@ public interface HouseService {
 
     SimpleResponse deleteHouse(Long houseId, Principal principal);
 
-    HouseResponse findByName(String houseName);
+    PaginationResponse findByName(String houseName, int page, int size);
 
     PagiUserHouse findByUserId(Long userId, int page, int size);
 

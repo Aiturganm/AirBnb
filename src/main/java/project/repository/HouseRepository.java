@@ -17,14 +17,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
-    @Query("select s from House s where s.nameOfHotel like :houseName ")
-    Optional<House> findByHouseName(String houseName);
+    @Query("select s from House s where s.isPublished= true and s.nameOfHotel like :houseName ")
+    Page<House> findByHouseName(String houseName, Pageable pageable);
 
     @Query("select s from House s where s.isPublished = true order by s.price asc")
     Page<House> sortAsc(Pageable pageable);
 
-    //    @Query("select new project.dto.response.HouseResponse(s.id,s.nameOfHotel , s.description, s.images, s.room , s.houseType, s.price, s.rating, s.guests) from House s where s.isPublished = false order by s.price desc")
-//    Page<HouseResponse> sortDesc(Pageable pageable, String desc);
+
     @Query("select s from House s where s.isPublished = true order by s.price desc")
     Page<House> sortDesc(Pageable pageable);
 

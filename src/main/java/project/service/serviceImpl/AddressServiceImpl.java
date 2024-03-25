@@ -54,7 +54,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public SimpleResponse update(Long addressId,Region region ,AddressRequest addressRequest) {
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new NotFoundException("Not found address with id " + addressId));
-       // addressRepository.existsByStreet(addressRequest.street());
+        addressRepository.existsByStreet(addressRequest.street());
         boolean b = addressRepository.existsByStreet(addressRequest.street());
         if (b){
         address.setRegion(region);

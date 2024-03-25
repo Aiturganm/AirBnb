@@ -64,8 +64,8 @@ public class HouseApi {
 
     @PermitAll
     @GetMapping("/getHouseByName")
-    public HouseResponse findByName(@RequestParam String houseName) {
-        return houseService.findByName(houseName);
+    public PaginationResponse findByName(@RequestParam String houseName, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size) {
+        return houseService.findByName(houseName, page, size);
     }
 
     @PermitAll
