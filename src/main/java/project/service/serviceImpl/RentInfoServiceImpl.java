@@ -38,9 +38,34 @@ public class RentInfoServiceImpl implements RentInfoService {
                 new NotFoundException("House with id " + houseId + " not found"));
 
         boolean isAccept = false;
+
+
+
         if (!house.isBlock() && house.isPublished()) {
-            for (RentInfo rentInfo : house.getRentInfos()) {
+            log.info("1-if");
+            if (!house.isBooked()) {
+                log.info("2-if");
+                int rentDay = request.checkOut().compareTo(request.checkIn());
+                BigDecimal totalPrice = house.getPrice().multiply(BigDecimal.valueOf(rentDay));
+                int result = user.getCard().getMoney().compareTo(totalPrice);
+                if (result < 0)
+                    return SimpleResponse.builder().httpStatus(HttpStatus.BAD_REQUEST).message("Your balance less then total price of rent").build();
+                BigDecimal subtract = user.getCard().getMoney().subtract(totalPrice);
+                BigDecimal add = house.getUser().getCard().getMoney().add(totalPrice);
+                RentInfo rentInfo1 = new RentInfo();
+                rentInfo1.setUser(user);
+                rentInfo1.setHouse(house);
+                rentInfo1.setCheckIn(request.checkIn());
+                rentInfo1.setCheckOut(request.checkOut());
+                rentInfo1.setTotalPrice(totalPrice);
+                rentInfoRepository.save(rentInfo1);
+                house.addRentInfo(rentInfo1);
+                isAccept = true;
+            } else {
+                log.info("1-else");
+                RentInfo rentInfo = house.getRentInfos().get(house.getRentInfos().size() - 1);
                 if (rentInfo.getCheckOut().isBefore(request.checkIn()) && request.checkOut().isAfter(request.checkIn())) {
+                    log.info("3-if");
                     int rentDay = request.checkOut().compareTo(request.checkIn());
                     BigDecimal totalPrice = house.getPrice().multiply(BigDecimal.valueOf(rentDay));
                     int result = user.getCard().getMoney().compareTo(totalPrice);
@@ -57,18 +82,17 @@ public class RentInfoServiceImpl implements RentInfoService {
                     rentInfoRepository.save(rentInfo1);
                     house.addRentInfo(rentInfo1);
                     isAccept = true;
-                } else {
-                    throw new AlreadyExistsException("This house not free for " + request.checkIn() + " day.");
                 }
             }
         }
-        if(isAccept){
+
+
+        if (isAccept) {
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.OK)
                     .message("Successfully rented house " + house.getNameOfHotel() + " with id " + house.getId() + " to client " + user.getUsername())
                     .build();
-        }
-        else return SimpleResponse.builder()
+        } else return SimpleResponse.builder()
                 .httpStatus(HttpStatus.NOT_ACCEPTABLE)
                 .message("Doesn't rented house")
                 .build();

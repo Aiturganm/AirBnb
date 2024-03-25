@@ -24,7 +24,7 @@ public class AuthApi {
         return userService.signUp(signUpRequest);
     }
     @PutMapping("/signIn")
-    public SignResponse signIn(@RequestBody SignInRequest signInRequest){
+    public SignResponse signIn(@RequestBody SignInRequest signInRequest) {
         return userService.signIn(signInRequest);
     }
 
