@@ -13,6 +13,7 @@ import project.enums.HouseType;
 import project.enums.Region;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
@@ -54,10 +55,14 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     @Query("select s from House s join s.user u where u.id = :userId")
     Page<House> findAllUserHouse(Long userId, Pageable pageable);
 
-
+    @Modifying
+    @Query("update House h set h.isBlock = true, h.isPublished = false where h.user.id = :userId")
+    void blockAllHousesUser(Long userId);
+  
     @Query("select s from House s")
     Page<House> findAllHouses(Pageable pageable);
 
-
-
+    @Modifying
+    @Query("update House h set h.isBlock = false , h.isPublished = true where h.user.id = :userId")
+    void unBlockAllHousesUser(Long userId);
 }
