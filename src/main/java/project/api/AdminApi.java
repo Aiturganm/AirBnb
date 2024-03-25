@@ -7,6 +7,8 @@ import project.dto.request.AcceptOrRejectReq;
 import project.dto.response.*;
 import project.enums.ActionForHouse;
 import project.enums.BlockOrUnBlock;
+import project.enums.HouseType;
+import project.enums.Region;
 import project.service.HouseService;
 import project.service.UserService;
 import project.service.serviceImpl.AdminService;
@@ -55,6 +57,26 @@ public class AdminApi {
     @GetMapping("/getAllUsers")
     public PaginationUserResponse getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
         return userService.findAll(page,size);
+    }
+    @Secured("ADMIN")
+    @GetMapping("/filterByPrice")
+    public PaginationResponse sortByPrice(@RequestParam String ascOrDesc,@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.sortByPrice(ascOrDesc,page,size);
+    }
+    @Secured("ADMIN")
+    @GetMapping("/filterByRegion")
+    public PaginationResponse findByRegion(@RequestParam Region region, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
+        return houseService.findByRegion(region,page,size);
+    }
+    @Secured("ADMIN")
+    @GetMapping("/filterByHomeType")
+    public PaginationResponse filterByType(@RequestParam HouseType type, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
+        return houseService.filterByType(type,page,size);
+    }
+    @Secured("ADMIN")
+    @GetMapping("/findPopular")
+    public PaginationResponse popularsHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+        return houseService.popularHouses(page,size);
     }
 
 }
