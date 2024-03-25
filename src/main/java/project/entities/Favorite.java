@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,5 +20,5 @@ public class Favorite extends BaseEntity{
     @OneToOne(cascade = {CascadeType.PERSIST})
     private User user;
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    private List<House> houses;
+    private List<House> houses = new ArrayList<>();
 }
