@@ -38,6 +38,20 @@ public class HouseServiceImpl implements HouseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    @PostConstruct
+    public UserResponse initUser() {
+        User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role.ADMIN, true, "njdkmvscl");
+        userRepository.save(user);
+        return UserResponse.builder()
+                .token(jwtService.createToken(user))
+                .email(user.getEmail())
+                .role(user.getRole())
+                .httpStatus(HttpStatus.OK)
+
+                .build();
+    }
+
+
     @Override
     public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType) {
         House house = new House();
@@ -103,7 +117,6 @@ public class HouseServiceImpl implements HouseService {
     @Transactional
     public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType) {
         House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
-        log.info(String.valueOf(house1.getId()));
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         for (House house : user.getHouses()) {
@@ -128,14 +141,14 @@ public class HouseServiceImpl implements HouseService {
                 .build();
     }
 
-    @Override @Transactional
+    @Override
     public SimpleResponse deleteHouse(Long houseId, Principal principal) {
         House house = houseRepository.findById(houseId)
                 .orElseThrow(() -> new NotFoundException("House not found"));
 
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
-      
+
         if (user.getRole().equals(Role.ADMIN) || user.getHouses().stream().anyMatch(userHouse -> userHouse.getId().equals(house.getId()))) {
             user.getHouses().removeIf(userHouse -> userHouse.getId().equals(house.getId()));
             houseRepository.deleteById(house.getId());
@@ -149,16 +162,6 @@ public class HouseServiceImpl implements HouseService {
                     .httpStatus(HttpStatus.MULTI_STATUS)
                     .message("You cannot delete this house")
                     .build();
-        for (House house : user.getHouses()) {
-            log.info("FOR HOUSE ID CHECK: "  + house.getId());
-            if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                house.getUser().setHouses(null);
-                houseRepository.delete(house1);
-                return SimpleResponse.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .message("success deleted")
-                        .build();
-            }
         }
 
     }
@@ -179,7 +182,6 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public PagiUserHouse findByUserId(Long userId, int page, int size) {
-        log.info(String.valueOf(userId));
         Pageable pageable = PageRequest.of(page - 1, size);
         List<UserHouseResponse> userHouseResponses = new ArrayList<>();
         Page<House> houses = houseRepository.findAllUserHouse(userId, pageable);
@@ -257,6 +259,8 @@ public class HouseServiceImpl implements HouseService {
         throw new NotFoundException("not found");
     }
 
+
+
     @Override
     public PaginationResponse filterByType(HouseType type, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -297,7 +301,6 @@ public class HouseServiceImpl implements HouseService {
     public PaginationResponse popularHouses(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.popularHouses(pageable);
-        log.info("allPublished list size:" + String.valueOf(allPublished.getTotalPages()));
         List<HouseResponse> houseResponses = new ArrayList<>();
         for (House house : allPublished) {
             if (!house.isPublished()) {
