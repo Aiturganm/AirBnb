@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class FeedBackResponse {
     String comm;
-    private byte rating;
+    private double rating;
 
 }

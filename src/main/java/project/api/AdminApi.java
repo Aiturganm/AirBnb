@@ -26,7 +26,7 @@ public class AdminApi {
     @Secured("ADMIN")
     @GetMapping("/getAllPublicHouse")
     public PaginationResponse allPublicHouses(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size) {
-        return houseService.findAllPublisged(page, size);
+        return houseService.findAllPublished(page, size);
     }
 
 
@@ -42,17 +42,17 @@ public class AdminApi {
         return adminService.acceptOrReject(houseId, actionForHouse, principal, acceptOrRejectReq);
     }
 
-    @Secured("ADMIN")
-    @PutMapping("/blockUnBlock/{houseId}")
-    public SimpleResponse blockUnBlock(@PathVariable Long houseId, @RequestParam BlockOrUnBlock blockOrUnBlock) {
-        return adminService.blockUnBlock(houseId, blockOrUnBlock);
-    }
-
-    @Secured("ADMIN")
-    @PutMapping("/vendorBlockOrUnblock/{userId}")
-    public SimpleResponse userBlockOrUnBlock(@PathVariable Long userId, @RequestParam BlockOrUnBlock blockOrUnBlock) {
-        return adminService.userBlockOrUnBlock(userId, blockOrUnBlock);
-    }
+//    @Secured("ADMIN")
+//    @PutMapping("/blockUnBlock/{houseId}")
+//    public SimpleResponse blockUnBlock(@PathVariable Long houseId, @RequestParam BlockOrUnBlock blockOrUnBlock) {
+//        return adminService.blockUnBlock(houseId, blockOrUnBlock);
+//    }
+//
+//    @Secured("ADMIN")
+//    @PutMapping("/vendorBlockOrUnblock/{userId}")
+//    public SimpleResponse userBlockOrUnBlock(@PathVariable Long userId, @RequestParam BlockOrUnBlock blockOrUnBlock) {
+//        return adminService.userBlockOrUnBlock(userId, blockOrUnBlock);
+//    }
     @Secured("ADMIN")
     @GetMapping("/getAllUsers")
     public PaginationUserResponse getAllUsers(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){

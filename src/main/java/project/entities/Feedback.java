@@ -17,7 +17,7 @@ import java.util.List;
 @SequenceGenerator(name = "feedback_gen",allocationSize = 1)
 public class Feedback extends BaseEntity{
     private String comment;
-    private byte rating;
+    private double rating;
     @ElementCollection
     List<String> images;
     @ElementCollection

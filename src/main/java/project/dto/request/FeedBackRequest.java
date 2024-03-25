@@ -18,8 +18,6 @@ public class FeedBackRequest {
     @NotNull
     private List<String> images;
     @RatingValidation
-    private byte rating;
-    public Feedback convert() {
-        return new Feedback(this.comm,this.images, rating);
-    }
+    private double rating;
+
 }

@@ -21,7 +21,7 @@ public record HouseResponse (
         byte room,
         HouseType houseType,
         BigDecimal price,
-        byte rating,
+        double rating,
         int guests
 ) {}
 
