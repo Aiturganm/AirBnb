@@ -12,22 +12,25 @@ import project.config.jwt.JwtService;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
 import project.dto.request.UserRequest;
-import project.dto.response.PaginationUserResponse;
-import project.dto.response.RegisterResponse;
-import project.dto.response.SignResponse;
-import project.dto.response.SimpleResponse;
+import project.dto.response.*;
 import project.dto.response.UserResponse;
+import project.entities.Address;
 import project.entities.House;
 import project.entities.User;
+import project.enums.Region;
 import project.exception.AlreadyExistsException;
 import project.exception.BadRequestException;
 import project.exception.ForbiddenException;
 import project.exception.NotFoundException;
+import project.repository.AddressRepository;
+import project.repository.HouseRepository;
 import project.repository.UserRepository;
 import project.service.UserService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
+    private final HouseRepository houseRepository;
+    private final AddressRepository addressRepository;
     @Override
     public SimpleResponse signUp(SignUpRequest signUpRequest) {
         boolean exist = userRepository.existsByEmail(signUpRequest.getEmail());
@@ -135,4 +139,19 @@ public class UserServiceImpl implements UserService {
                 .message("Success deleted!")
                 .build();
     }
+
+    @Override
+    public UserResponse findById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found User with id " + userId));
+        return UserResponse.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .dateOfBirth(user.getDateOfBirth())
+                .role(user.getRole())
+                .isBlock(user.isBlock())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
+    }
+
 }
