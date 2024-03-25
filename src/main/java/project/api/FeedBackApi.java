@@ -24,18 +24,20 @@ public class FeedBackApi {
 
     @PermitAll
     @PostMapping("/saveFeedBack/{houseId}")
-    public SimpleResponse saveFeedback(@RequestBody @ Valid FeedBackRequest feedBackRequest, Principal principal, @PathVariable
+    public SimpleResponse saveFeedback(@RequestBody @Valid FeedBackRequest feedBackRequest, Principal principal, @PathVariable
     Long houseId) {
         return feedBackService.saveFeedBack(feedBackRequest, principal, houseId);
     }
+
     @GetMapping("/getFeedBackById/{feedId}")
     public FeedBackResponse getFeedback(@PathVariable Long feedId) {
         return feedBackService.getFeedBack(feedId);
     }
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'VENDER')")
+
+    @PermitAll
     @PutMapping("/updateFeed/{feedId}")
-    public SimpleResponse updateFeed(@RequestBody FeedBackRequest feedBackRequest, @PathVariable Long feedId, Principal principal){
-        return feedBackService.updateFeed(feedBackRequest,feedId, principal);
+    public SimpleResponse updateFeed(@RequestBody FeedBackRequest feedBackRequest, @PathVariable Long feedId, Principal principal) {
+        return feedBackService.updateFeed(feedBackRequest, feedId, principal);
     }
 
 

@@ -150,8 +150,12 @@ public class HouseServiceImpl implements HouseService {
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
 
+
         if (user.getRole().equals(Role.ADMIN) || user.getHouses().stream().anyMatch(userHouse -> userHouse.getId().equals(house.getId()))) {
+
             user.getHouses().removeIf(userHouse -> userHouse.getId().equals(house.getId()));
+
+
             houseRepository.deleteById(house.getId());
 
             return SimpleResponse.builder()
@@ -164,21 +168,20 @@ public class HouseServiceImpl implements HouseService {
                     .message("You cannot delete this house")
                     .build();
         }
-
     }
 
     @Override
-    public HouseResponse findByName(String houseName) {
-        House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new NotFoundException("house not found"));
-        return HouseResponse.builder()
-                .id(house.getId())
-                .nameOfHotel(house.getNameOfHotel())
-                .description(house.getDescription())
-                .houseType(house.getHouseType())
-                .rating(house.getRating())
-                .images(house.getImages())
-                .room(house.getRoom())
-                .build();
+    public PaginationResponse findByName(String houseName, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<House> houses = houseRepository.findByHouseName(houseName, pageable);
+        List<HouseResponse> houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
+        }
+        return PaginationResponse.builder()
+                .page(houses.getNumber() + 1)
+                .size(houses.getTotalPages())
+                .houseResponseList(houseResponses).build();
     }
 
     @Override
@@ -195,6 +198,7 @@ public class HouseServiceImpl implements HouseService {
                 .houseResponseList(userHouseResponses)
                 .build();
     }
+
     @Override
     public PaginationResponse sortByPrice(String ascOrDesc, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -256,7 +260,6 @@ public class HouseServiceImpl implements HouseService {
         }
         throw new NotFoundException("not found");
     }
-
 
 
     @Override
