@@ -1,6 +1,5 @@
 package project.service.serviceImpl;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -67,7 +66,7 @@ public class HouseServiceImpl implements HouseService {
             house.setUser(byEmail);
         byEmail.getHouses().add(house);
         house.setHouseType(houseType);
-        byte rating = 0;
+        double rating = 0;
         house.setRating(rating);
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
@@ -130,6 +129,7 @@ public class HouseServiceImpl implements HouseService {
             if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
                 house.setDescription(houseRequest.getDescription());
                 house.setRoom(houseRequest.getRoom());
+                house.setHouseType(houseType);
                 house.setImages(houseRequest.getImages());
                 house.setPrice(houseRequest.getPrice());
                 house.setGuests(houseRequest.getGuests());

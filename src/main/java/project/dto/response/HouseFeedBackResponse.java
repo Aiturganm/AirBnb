@@ -15,7 +15,7 @@ public record HouseFeedBackResponse(
         byte room,
         HouseType houseType,
         BigDecimal price,
-        byte rating,
+        double rating,
         int guests,
         List<FeedBackResponse>feedBackResponses
 ) {

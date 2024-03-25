@@ -27,7 +27,7 @@ public class House extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private HouseType houseType;
     private BigDecimal price;
-    private byte rating;
+    private double rating;
     private boolean isBooked;
     private int guests;
     private boolean isPublished;
