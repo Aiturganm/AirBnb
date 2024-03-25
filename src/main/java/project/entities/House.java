@@ -6,6 +6,7 @@ import org.apache.catalina.LifecycleState;
 import project.enums.HouseType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,21 @@ public class House extends BaseEntity{
     private int guests;
     private boolean isPublished;
     private boolean isBlock;
+    private String reason;
+
+    public House( String nameOfHotel, String description, List<String> images, byte room, HouseType houseType, BigDecimal price, byte rating, boolean isBooked, int guests, boolean isPublished, boolean isBlock) {
+        this.nameOfHotel = nameOfHotel;
+        this.description = description;
+        this.images = images;
+        this.room = room;
+        this.houseType = houseType;
+        this.price = price;
+        this.rating = rating;
+        this.isBooked = isBooked;
+        this.guests = guests;
+        this.isPublished = isPublished;
+        this.isBlock = isBlock;
+    }
 
     @OneToMany(mappedBy = "house", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<Feedback> feedbacks;

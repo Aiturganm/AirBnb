@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.*;
 
 import project.dto.request.SignUpRequest;
 import project.dto.request.UserRequest;
-import project.dto.response.PaginationUserResponse;
-import project.dto.response.RegisterResponse;
-import project.dto.response.SimpleResponse;
+import project.dto.response.*;
 
 
-
+import project.entities.House;
+import project.enums.Region;
 import project.service.UserService;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/users")
@@ -40,5 +42,9 @@ public class UserApi {
         return userService.delete(userId);
     }
 
+    @GetMapping("/findById/{userId}")
+    public UserResponse findById(@PathVariable Long userId){
+        return userService.findById(userId);
+    }
 
 }

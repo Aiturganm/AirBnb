@@ -33,11 +33,11 @@ public class InitialDataSource {
     @Transactional
     public void saveData() {
         User admin = userRepository.findByEmail("admin@gmail.com")
-                .orElseGet(() -> new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2000, 12, 12), Role.ADMIN, true, "+996777858585"));
+                .orElseGet(() -> new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2000, 12, 12), Role.ADMIN, false, "+996777858585"));
         User vendor = userRepository.findByEmail("vendor@gmail.com")
-                .orElseGet(() -> new User("vendor", "vendor", "vendor@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2000, 12, 12), Role.VENDOR, true, "+996777858585"));
+                .orElseGet(() -> new User("vendor", "vendor", "vendor@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2000, 12, 12), Role.VENDOR, false, "+996777858585"));
         User client = userRepository.findByEmail("client@gmail.com")
-                .orElseGet(() -> new User("client", "client", "client@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2000, 12, 12), Role.USER, true, "+996777858585"));
+                .orElseGet(() -> new User("client", "client", "client@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2000, 12, 12), Role.USER, false, "+996777858585"));
         House house = createHouse(vendor);
         houseRepository.save(house);
         vendor.getHouses().add(house);
@@ -66,7 +66,7 @@ public class InitialDataSource {
         house.setRating((byte) 5);
         house.setBooked(false);
         house.setGuests(2);
-        house.setPublished(false);
+        house.setPublished(true);
         house.setBlock(false);
         house.setUser(user);
         return house;

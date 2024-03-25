@@ -29,7 +29,6 @@ public class User extends BaseEntity implements UserDetails {
         private Role role;
         private boolean isBlock;
         private String phoneNumber;
-
     public User(Long id, LocalDate createdAt, LocalDate updatedAt, String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, String phoneNumber) {
         super(id, createdAt, updatedAt);
         this.firstName = firstName;
@@ -41,6 +40,12 @@ public class User extends BaseEntity implements UserDetails {
         this.phoneNumber = phoneNumber;
     }
 
+    //Relations
+    @OneToOne
+    private Card card;
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<House> houses = new ArrayList<>();
+
     public User(String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, boolean isBlock, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,12 +56,6 @@ public class User extends BaseEntity implements UserDetails {
         this.isBlock = isBlock;
         this.phoneNumber = phoneNumber;
     }
-
-    //Relations
-    @OneToOne
-    private Card card;
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<House> houses = new ArrayList<>();
 
 
     @Override
