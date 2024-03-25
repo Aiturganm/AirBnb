@@ -16,7 +16,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class RentInfoApi {
     private final RentInfoService rentInfoService;
-
+//AAAAAAAAAAAAAAAAAAAA
     @Secured({"USER", "VENDOR"})
     @PostMapping("/save")
     public SimpleResponse createRent(@RequestBody @Valid RentRequest request, Principal principal){

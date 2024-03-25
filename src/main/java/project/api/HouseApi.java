@@ -70,8 +70,8 @@ public class HouseApi {
 
     @PermitAll
     @GetMapping("/getHouseByUserId/{userId}")
-    public PagiUserHouse findByUserId(@PathVariable Long userId, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size){
-        return houseService.findByUserId(userId,page,size);
+    public PagiUserHouse findByUserId(@PathVariable Long userId, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "4") int size) {
+        return houseService.findByUserId(userId, page, size);
     }
 
     @PermitAll
