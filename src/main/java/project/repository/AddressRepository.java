@@ -20,4 +20,5 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
     boolean existsByStreet(String street);
     @Query("select a from Address a where a.house.id = :houseId")
     Address findByHouseId(Long houseId);
+
 }
