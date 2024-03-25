@@ -42,14 +42,16 @@ public class RentInfoServiceImpl implements RentInfoService {
 
 
         if (!house.isBlock() && house.isPublished()) {
+            log.info("1-if");
             if (!house.isBooked()) {
+                log.info("2-if");
                 int rentDay = request.checkOut().compareTo(request.checkIn());
                 BigDecimal totalPrice = house.getPrice().multiply(BigDecimal.valueOf(rentDay));
                 int result = user.getCard().getMoney().compareTo(totalPrice);
                 if (result < 0)
                     return SimpleResponse.builder().httpStatus(HttpStatus.BAD_REQUEST).message("Your balance less then total price of rent").build();
-//                BigDecimal subtract = user.getCard().getMoney().subtract(totalPrice);
-//                BigDecimal add = house.getUser().getCard().getMoney().add(totalPrice);
+                BigDecimal subtract = user.getCard().getMoney().subtract(totalPrice);
+                BigDecimal add = house.getUser().getCard().getMoney().add(totalPrice);
                 RentInfo rentInfo1 = new RentInfo();
                 rentInfo1.setUser(user);
                 rentInfo1.setHouse(house);
@@ -60,8 +62,10 @@ public class RentInfoServiceImpl implements RentInfoService {
                 house.addRentInfo(rentInfo1);
                 isAccept = true;
             } else {
+                log.info("1-else");
                 RentInfo rentInfo = house.getRentInfos().get(house.getRentInfos().size() - 1);
                 if (rentInfo.getCheckOut().isBefore(request.checkIn()) && request.checkOut().isAfter(request.checkIn())) {
+                    log.info("3-if");
                     int rentDay = request.checkOut().compareTo(request.checkIn());
                     BigDecimal totalPrice = house.getPrice().multiply(BigDecimal.valueOf(rentDay));
                     int result = user.getCard().getMoney().compareTo(totalPrice);
