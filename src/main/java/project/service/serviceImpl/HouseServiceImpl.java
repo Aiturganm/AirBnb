@@ -38,7 +38,7 @@ public class HouseServiceImpl implements HouseService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    @PostConstruct
+//    @PostConstruct
     public UserResponse initUser() {
         User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role.ADMIN, true, "njdkmvscl");
         userRepository.save(user);
