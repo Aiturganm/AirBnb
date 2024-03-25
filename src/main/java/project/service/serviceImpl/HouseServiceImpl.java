@@ -184,17 +184,19 @@ public class HouseServiceImpl implements HouseService {
     public PagiUserHouse findByUserId(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         List<UserHouseResponse> userHouseResponses = new ArrayList<>();
+
+        // Call the repository method to find houses by user ID
         Page<House> houses = houseRepository.findAllUserHouse(userId, pageable);
+
         for (House house : houses) {
             userHouseResponses.add(new UserHouseResponse(house.getUser().getFirstName(), house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getGuests()));
         }
+
         return PagiUserHouse.builder()
                 .page(houses.getNumber() + 1)
                 .size(houses.getTotalPages())
                 .houseResponseList(userHouseResponses)
                 .build();
-
-
     }
 
     @Override
@@ -281,10 +283,8 @@ public class HouseServiceImpl implements HouseService {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.FindAllNotPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
-        byte rating = houseRepository.rating();
         for (House house : allPublished) {
             if (!house.isPublished()) {
-                house.setRating(rating);
                 houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
             }
         }
