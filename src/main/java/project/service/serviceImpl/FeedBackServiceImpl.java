@@ -52,7 +52,7 @@ public class FeedBackServiceImpl implements FeedBackService {
         User byEmail = userRepository.getByEmail(name);
 
         Feedback feedback = feedBackRepository.findById(feedId).orElseThrow(() -> new NotFoundException("feed not found"));
-        if (feedback.getUser().getId() == byEmail.getId() || byEmail.getRole().equals(Role.ADMIN)) {
+        if (feedback.getUser().getId().equals( byEmail.getId()) || byEmail.getRole().equals(Role.ADMIN)) {
             feedBackRepository.delete(feedback);
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.OK)
@@ -72,26 +72,29 @@ public class FeedBackServiceImpl implements FeedBackService {
         return feedBackResponse;
     }
 
-    @Override  @Transactional
+    @Override
+    @Transactional
     public SimpleResponse updateFeed(FeedBackRequest feedBackRequest, Long feedId, Principal principal) {
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
         Feedback feedback = feedBackRepository.findById(feedId).orElseThrow(() -> new NotFoundException("feed not found"));
-        if (feedback.getUser().getId() == byEmail.getId() || byEmail.getRole().equals(Role.ADMIN)) {
 
+        if (feedback.getUser().getId().equals(byEmail.getId()) || byEmail.getRole().equals(Role.ADMIN)) {
             feedback.setComment(feedBackRequest.getComm());
             feedback.setRating(feedBackRequest.getRating());
             feedback.setImages(feedBackRequest.getImages());
             feedBackRepository.save(feedback);
+
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.OK)
-                    .message("success updated")
+                    .message("Success: Feedback updated")
+                    .build();
+        } else
+            return SimpleResponse.builder()
+                    .httpStatus(HttpStatus.OK)
+                    .message("You cannot update this feedback")
                     .build();
 
-        }
-        return SimpleResponse.builder()
-                .httpStatus(HttpStatus.OK)
-                .message("you cant updated")
-                .build();
+
     }
 }
