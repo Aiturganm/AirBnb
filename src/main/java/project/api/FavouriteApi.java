@@ -16,7 +16,7 @@ public class FavouriteApi {
 
     @PostMapping("save/{houseId}")
     public SimpleResponse saveFav(@PathVariable Long houseId){
-        return null;
+        return favoriteService.save(houseId);
     }
 
 }
