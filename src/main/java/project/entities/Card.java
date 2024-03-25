@@ -20,6 +20,10 @@ public class Card extends BaseEntity{
     @OneToOne(cascade = {CascadeType.PERSIST})
     private User user;
 
+    public void addMoney(BigDecimal newMoney){
+        if(this.money == null) this.money = BigDecimal.valueOf(0);
+        BigDecimal add = this.money.add(newMoney);
+    }
     public Card( int carNumber, BigDecimal money) {
         this.carNumber = carNumber;
         this.money = money;
