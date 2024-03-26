@@ -1,50 +1,45 @@
 package project.api;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import project.dto.request.SignUpRequest;
-import project.dto.request.UserRequest;
 import project.dto.response.*;
-
-
-import project.entities.House;
-import project.enums.Region;
 import project.service.UserService;
 
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserApi {
     private final UserService userService;
-    //
 
+    //
+    @Operation(summary = "Возвращает пагинированный список всех пользователей.")
     @GetMapping("/findAll")
     public PaginationUserResponse findAll(@RequestParam int page,
-                                          @RequestParam int size){
-       return userService.findAll(page,size);
-    }
-    @PutMapping("/{userId}")
-    public SimpleResponse update(@PathVariable Long userId,
-                                 @RequestBody UserRequest userRequest){
-        return userService.update(userId,userRequest);
+                                          @RequestParam int size) {
+        return userService.findAll(page, size);
     }
 
-    @DeleteMapping("/{userId}")
-    public SimpleResponse delete (@PathVariable Long userId){
-        return userService.delete(userId);
+    @PutMapping("/update")
+    @Operation(summary = "Обновляет информацию о пользователе.")
+    public SimpleResponse update(
+            @RequestBody SignUpRequest signUpRequest) {
+        return userService.update(signUpRequest);
     }
 
-    @GetMapping("/findById/{userId}")
-    public UserResponse findById(@PathVariable Long userId){
-        return userService.findById(userId);
+    @DeleteMapping("/delete")
+    @Operation(summary = "Удаляет текущего пользователя и все его дома.")
+    public SimpleResponse delete() {
+        return userService.delete();
     }
+
 
 }

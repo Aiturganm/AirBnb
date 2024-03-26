@@ -2,6 +2,7 @@ package project.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import project.dto.response.FeedBackResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,5 +43,9 @@ public class Feedback extends BaseEntity{
             this.dislikes = new ArrayList<>();
         }
         this.dislikes.add(id);
+    }
+
+    public FeedBackResponse convert() {
+        return new FeedBackResponse(this.comment,this.rating,this.images);
     }
 }

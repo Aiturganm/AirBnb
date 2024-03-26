@@ -1,5 +1,9 @@
 package project.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.annotation.Secured;
@@ -17,14 +21,25 @@ import project.service.UserService;
 @Slf4j
 public class AuthApi {
     private final UserService userService;
-
-    @PostMapping("/save")
-    public SimpleResponse signUp(@RequestBody SignUpRequest signUpRequest){
-        log.info("success saved!!!");
+    @Operation(summary = "Регистрация нового пользователя",
+            description = "Метод для регистрации нового пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Пользователь успешно зарегистрирован"),
+            @ApiResponse(responseCode = "400", description = "Электронная почта уже существует")
+    })
+    @PostMapping("/signUp")
+    public SimpleResponse signUp(@RequestBody @Valid SignUpRequest signUpRequest){
         return userService.signUp(signUpRequest);
     }
+
+    @Operation(summary = "Вход пользователя",
+            description = "Метод для аутентификации пользователя и генерации JWT-токена")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешный вход пользователя"),
+            @ApiResponse(responseCode = "403", description = "Неверный пароль")
+    })
     @PutMapping("/signIn")
-    public SignResponse signIn(@RequestBody SignInRequest signInRequest) {
+    public SignResponse signIn(@RequestBody @Valid  SignInRequest signInRequest) {
         return userService.signIn(signInRequest);
     }
 

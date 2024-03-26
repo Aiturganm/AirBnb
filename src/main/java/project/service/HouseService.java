@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.security.Principal;
 
 public interface HouseService {
-    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType);
+    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType,Region region);
 
     HouseFeedBackResponse findbyId(Long houseId);
 
