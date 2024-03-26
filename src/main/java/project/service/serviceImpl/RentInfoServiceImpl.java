@@ -3,7 +3,6 @@ package project.service.serviceImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import project.dto.request.RentRequest;

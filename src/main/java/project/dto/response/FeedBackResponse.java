@@ -13,6 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 public class FeedBackResponse {
     String comm;
-    private byte rating;
+    private double rating;
+    List<String> images;
 
+    public FeedBackResponse(String comm, double rating) {
+        this.comm = comm;
+        this.rating = rating;
+    }
 }

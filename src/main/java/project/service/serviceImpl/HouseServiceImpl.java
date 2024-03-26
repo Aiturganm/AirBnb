@@ -1,6 +1,5 @@
 package project.service.serviceImpl;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,14 +10,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.config.jwt.JwtService;
+import project.dto.request.AddressRequest;
 import project.dto.request.HouseRequest;
 import project.dto.response.*;
-import project.entities.House;
-import project.entities.User;
+import project.entities.*;
 import project.enums.HouseType;
 import project.enums.Region;
 import project.enums.Role;
 import project.exception.NotFoundException;
+import project.repository.AddressRepository;
+import project.repository.CardRepository;
 import project.repository.HouseRepository;
 import project.repository.UserRepository;
 import project.service.HouseService;
@@ -34,11 +35,13 @@ import java.util.List;
 @Slf4j
 public class HouseServiceImpl implements HouseService {
     private final UserRepository userRepository;
+    private final CardRepository cardRepository;
+    private final AddressRepository addressRepository;
     private final HouseRepository houseRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-//    @PostConstruct
+    //    @PostConstruct
     public UserResponse initUser() {
         User user = new User("admin", "admin", "admin@gmail.com", passwordEncoder.encode("1234"), LocalDate.of(2020, 12, 12), Role.ADMIN, true, "njdkmvscl");
         userRepository.save(user);
@@ -53,20 +56,20 @@ public class HouseServiceImpl implements HouseService {
 
 
     @Override
-    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType) {
+    public SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType, Region region) {
         House house = new House();
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
-        if (byEmail.getCard() == null) {
+        if (byEmail.getCard() == null || byEmail.isBlock()) {
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.BAD_REQUEST)
-                    .message("you dont have any card's")
+                    .message("you dont have any card's or YOU BLOCKED WITH ADMIN")
                     .build();
         } else
             house.setUser(byEmail);
         byEmail.getHouses().add(house);
         house.setHouseType(houseType);
-        byte rating = 0;
+        double rating = 0;
         house.setRating(rating);
         house.setDescription(houseRequest.getDescription());
         house.setRoom(houseRequest.getRoom());
@@ -74,7 +77,14 @@ public class HouseServiceImpl implements HouseService {
         house.setPrice(houseRequest.getPrice());
         house.setGuests(houseRequest.getGuests());
         house.setNameOfHotel(houseRequest.getNameOfHotel());
+        AddressRequest addressRequest = houseRequest.getAddressRequest();
+        Address check = addressRepository.getByStreet(addressRequest.street());
+        if (check != null) {
+            return SimpleResponse.builder().httpStatus(HttpStatus.CONFLICT).message("Street already exists!").build();
+        }
         houseRepository.save(house);
+        Address address = new Address(region, addressRequest.city(), addressRequest.street(), house);
+        addressRepository.save(address);
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
                 .message("house with name " + house.getNameOfHotel() + " successfully saved")
@@ -82,9 +92,13 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public HouseResponse findbyId(Long houseId) {
+    public HouseFeedBackResponse findbyId(Long houseId) {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
-        return HouseResponse.builder()
+        List<FeedBackResponse> feedBackResponses = new ArrayList<>();
+        for (Feedback feedback : house.getFeedbacks()) {
+            feedBackResponses.add(new FeedBackResponse(feedback.getComment(), feedback.getRating()));
+        }
+        return HouseFeedBackResponse.builder()
                 .id(house.getId())
                 .nameOfHotel(house.getNameOfHotel())
                 .description(house.getDescription())
@@ -94,11 +108,12 @@ public class HouseServiceImpl implements HouseService {
                 .rating(house.getRating())
                 .guests(house.getGuests())
                 .price(house.getPrice())
+                .feedBackResponses(feedBackResponses)
                 .build();
     }
 
     @Override
-    public PaginationResponse findAllPublisged(int page, int size) {
+    public PaginationResponse findAllPublished(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<House> allPublished = houseRepository.findAllPublished(pageable);
         List<HouseResponse> houseResponses = new ArrayList<>();
@@ -117,68 +132,85 @@ public class HouseServiceImpl implements HouseService {
     @Override
     @Transactional
     public SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType) {
-        House house1 = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
-        String name = principal.getName();
-        User user = userRepository.getByEmail(name);
-        for (House house : user.getHouses()) {
-            if (house1.getId().equals(house.getId()) || user.getRole().equals(Role.ADMIN)) {
-                house.setDescription(houseRequest.getDescription());
-                house.setRoom(houseRequest.getRoom());
-                house.setImages(houseRequest.getImages());
-                house.setPrice(houseRequest.getPrice());
-                house.setGuests(houseRequest.getGuests());
-                house.setNameOfHotel(houseRequest.getNameOfHotel());
-                houseRepository.save(house1);
-                return SimpleResponse.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .message("house with id " + house1.getNameOfHotel() + " successfully updated")
-                        .build();
-
-            }
-        }
-        return SimpleResponse.builder()
-                .httpStatus(HttpStatus.MULTI_STATUS)
-                .message("you can not update this house")
-                .build();
-    }
-
-    @Override
-    public SimpleResponse deleteHouse(Long houseId, Principal principal) {
-        House house = houseRepository.findById(houseId)
-                .orElseThrow(() -> new NotFoundException("House not found"));
-
-        String name = principal.getName();
-        User user = userRepository.getByEmail(name);
-
-        if (user.getRole().equals(Role.ADMIN) || user.getHouses().stream().anyMatch(userHouse -> userHouse.getId().equals(house.getId()))) {
-            user.getHouses().removeIf(userHouse -> userHouse.getId().equals(house.getId()));
-            houseRepository.deleteById(house.getId());
-
+        House findHouse = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("house not found"));
+        String emailCurrentUser = principal.getName();
+        User currentUser = userRepository.findByEmail(emailCurrentUser).orElseThrow(() -> new NotFoundException("Email or token invalid!"));
+        log.info("SIZE:  " + currentUser.getHouses().size());
+        if (currentUser.getRole().equals(Role.ADMIN)) {
+            findHouse.setDescription(houseRequest.getDescription());
+            findHouse.setRoom(houseRequest.getRoom());
+            findHouse.setHouseType(houseType);
+            findHouse.setImages(houseRequest.getImages());
+            findHouse.setPrice(houseRequest.getPrice());
+            findHouse.setGuests(houseRequest.getGuests());
+            findHouse.setNameOfHotel(houseRequest.getNameOfHotel());
             return SimpleResponse.builder()
                     .httpStatus(HttpStatus.OK)
-                    .message("Success: House deleted")
+                    .message("house with id " + findHouse.getNameOfHotel() + " successfully updated")
                     .build();
-        } else {
+        } else if (currentUser.getHouses().contains(findHouse)) {
+            log.info("2-IF");
+            findHouse.setDescription(houseRequest.getDescription());
+            findHouse.setRoom(houseRequest.getRoom());
+            findHouse.setHouseType(houseType);
+            findHouse.setImages(houseRequest.getImages());
+            findHouse.setPrice(houseRequest.getPrice());
+            findHouse.setGuests(houseRequest.getGuests());
+            findHouse.setNameOfHotel(houseRequest.getNameOfHotel());
             return SimpleResponse.builder()
-                    .httpStatus(HttpStatus.MULTI_STATUS)
-                    .message("You cannot delete this house")
+                    .httpStatus(HttpStatus.OK)
+                    .message("house with id " + findHouse.getNameOfHotel() + " successfully updated")
                     .build();
         }
+        return SimpleResponse.builder().httpStatus(HttpStatus.FORBIDDEN).message("You no can update this house!").build();
+    }
 
+
+    @Override
+    @Transactional
+    public SimpleResponse deleteHouse(Long houseId, Principal principal) {
+        String emailCurrentUser = principal.getName();
+        User currentUser = userRepository.getByEmail(emailCurrentUser);
+        House findHouse = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("House not found!" + houseId));
+        if (currentUser.getHouses().contains(findHouse)) {
+            log.info("DELETE HOUSE 1-if");
+            if (!findHouse.getRentInfos().isEmpty()) {
+                RentInfo lastRentInfo = findHouse.getRentInfos().getLast();
+                if (lastRentInfo != null && lastRentInfo.getCheckOut().isAfter(LocalDate.now())) {
+                    String clientEmail = lastRentInfo.getUser().getEmail();
+                    Card clientCard = cardRepository.findByUserEmail(clientEmail);
+                    String vendorEmail = findHouse.getUser().getEmail();
+                    Card vendorCard = cardRepository.findByUserEmail(vendorEmail);
+                    vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
+                    clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
+                }
+            }
+            Address address = addressRepository.findByHouseId(houseId);
+            if (address != null) {
+                address.setHouse(null);
+                addressRepository.delete(address);
+            }
+            User user = findHouse.getUser();
+            user.getHouses().remove(findHouse);
+            findHouse.setUser(null);
+            houseRepository.deleteById(findHouse.getId());
+            return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted this houses").build();
+        }
+        return SimpleResponse.builder().httpStatus(HttpStatus.FORBIDDEN).message("You no can deleted this house!").build();
     }
 
     @Override
-    public HouseResponse findByName(String houseName) {
-        House house = houseRepository.findByHouseName(houseName).orElseThrow(() -> new NotFoundException("house not found"));
-        return HouseResponse.builder()
-                .id(house.getId())
-                .nameOfHotel(house.getNameOfHotel())
-                .description(house.getDescription())
-                .houseType(house.getHouseType())
-                .rating(house.getRating())
-                .images(house.getImages())
-                .room(house.getRoom())
-                .build();
+    public PaginationResponse findByName(String houseName, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<House> houses = houseRepository.findByHouseName(houseName, pageable);
+        List<HouseResponse> houseResponses = new ArrayList<>();
+        for (House house : houses) {
+            houseResponses.add(new HouseResponse(house.getId(), house.getNameOfHotel(), house.getDescription(), house.getImages(), house.getRoom(), house.getHouseType(), house.getPrice(), house.getRating(), house.getGuests()));
+        }
+        return PaginationResponse.builder()
+                .page(houses.getNumber() + 1)
+                .size(houses.getTotalPages())
+                .houseResponseList(houseResponses).build();
     }
 
     @Override
@@ -195,6 +227,7 @@ public class HouseServiceImpl implements HouseService {
                 .houseResponseList(userHouseResponses)
                 .build();
     }
+
     @Override
     public PaginationResponse sortByPrice(String ascOrDesc, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -256,7 +289,6 @@ public class HouseServiceImpl implements HouseService {
         }
         throw new NotFoundException("not found");
     }
-
 
 
     @Override

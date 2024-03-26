@@ -1,15 +1,10 @@
 package project.repository;
 
-import org.hibernate.annotations.processing.SQL;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-import project.dto.response.RentResponse;
-import project.entities.Address;
 import project.entities.RentInfo;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface RentInfoRepository extends JpaRepository<RentInfo, Long> {
 

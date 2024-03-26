@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+import project.dto.response.HouseResForAdmin;
 import project.dto.response.HouseResponse;
 import project.entities.House;
 import project.enums.HouseType;
@@ -17,8 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
-    @Query("select s from House s where s.nameOfHotel like :houseName ")
-    Optional<House> findByHouseName(String houseName);
+    @Query("select s from House s where s.isPublished =true and s.nameOfHotel like :houseName ")
+    Page<House> findByHouseName(String houseName, Pageable pageable);
 
     @Query("select s from House s where s.isPublished = true order by s.price asc")
     Page<House> sortAsc(Pageable pageable);
@@ -58,11 +59,26 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     @Modifying
     @Query("update House h set h.isBlock = true, h.isPublished = false where h.user.id = :userId")
     void blockAllHousesUser(Long userId);
-  
+
     @Query("select s from House s")
     Page<House> findAllHouses(Pageable pageable);
 
     @Modifying
     @Query("update House h set h.isBlock = false , h.isPublished = true where h.user.id = :userId")
     void unBlockAllHousesUser(Long userId);
+
+    @Query("select new project.dto.response.HouseResForAdmin(h.id, h.nameOfHotel, h.description, " +
+            "h.room, h.houseType, h.price, h.rating, h.isBooked, h.guests, " +
+            "h.isPublished, h.isBlock, h.reason, count(hfs), count(hfav), count(hrs)) " +
+            "from House h " +
+            "left join h.feedbacks hfs " +
+            "left join h.favorites hfav " +
+            "left join h.rentInfos hrs " +
+            "where h.user.id = :userId " +
+            "group by h.id, h.nameOfHotel, h.description, h.room, h.houseType, h.price, " +
+            "h.rating, h.isBooked, h.guests, h.isPublished, h.isBlock, h.reason")
+    List<HouseResForAdmin> findAllHouseByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT h FROM Favorite f JOIN f.houses h WHERE f.id = :favId")
+    Page<House> findAllHousesByFavoriteId(Pageable pageable, @Param("favId") Long favId);
 }

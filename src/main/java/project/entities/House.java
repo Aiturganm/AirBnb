@@ -3,6 +3,7 @@ package project.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.catalina.LifecycleState;
+import project.dto.response.HouseResponse;
 import project.enums.HouseType;
 
 import java.math.BigDecimal;
@@ -27,7 +28,7 @@ public class House extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private HouseType houseType;
     private BigDecimal price;
-    private byte rating;
+    private double rating;
     private boolean isBooked;
     private int guests;
     private boolean isPublished;
@@ -76,5 +77,9 @@ public class House extends BaseEntity{
             this.rentInfos = new ArrayList<>();
         }
         this.rentInfos.add(rentInfo);
+    }
+
+    public HouseResponse convert() {
+        return new HouseResponse(super.getId(),this.nameOfHotel,this.description,this.images,this.room,this.houseType,this.price,this.rating,this.guests);
     }
 }

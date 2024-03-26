@@ -28,4 +28,14 @@ public class HouseRequest {
     @MinesValidation
     private int guests;
 
+    private AddressRequest addressRequest;
+
+    public HouseRequest(String nameOfHotel, String description, List<String> images, byte room, BigDecimal price, int guests) {
+        this.nameOfHotel = nameOfHotel;
+        this.description = description;
+        this.images = images;
+        this.room = room;
+        this.price = price;
+        this.guests = guests;
+    }
 }

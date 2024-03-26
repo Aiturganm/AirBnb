@@ -3,7 +3,6 @@ package project.service;
 import project.dto.request.RentRequest;
 import project.dto.response.RentResponse;
 import project.dto.response.SimpleResponse;
-import project.repository.RentInfoRepository;
 
 import java.security.Principal;
 import java.time.LocalDate;

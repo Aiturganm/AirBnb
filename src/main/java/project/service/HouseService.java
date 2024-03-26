@@ -11,17 +11,17 @@ import java.math.BigDecimal;
 import java.security.Principal;
 
 public interface HouseService {
-    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType);
+    SimpleResponse saveHouse(HouseRequest houseRequest, Principal principal, HouseType houseType,Region region);
 
-    HouseResponse findbyId(Long houseId);
+    HouseFeedBackResponse findbyId(Long houseId);
 
-    PaginationResponse findAllPublisged(int page, int size);
+    PaginationResponse findAllPublished(int page, int size);
 
     SimpleResponse updateHouse(HouseRequest houseRequest, Long houseId, Principal principal, HouseType houseType);
 
     SimpleResponse deleteHouse(Long houseId, Principal principal);
 
-    HouseResponse findByName(String houseName);
+    PaginationResponse findByName(String houseName, int page, int size);
 
     PagiUserHouse findByUserId(Long userId, int page, int size);
 
