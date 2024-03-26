@@ -1,12 +1,14 @@
 package project.dto.response;
 
-import org.springframework.http.HttpStatus;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record RentResponse (
-        HttpStatus httpStatus,
-        String message,
+        Long houseId,
+        Long userId,
+        String checkIn_checkOut,
         BigDecimal totalPrice
 ){
 }
