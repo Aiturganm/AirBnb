@@ -112,7 +112,7 @@ public class FeedBackServiceImpl implements FeedBackService {
     @Override
     public FeedBackResponse getFeedBack(Long feedId) {
         Feedback feedback = feedBackRepository.findById(feedId).orElseThrow(() -> new NotFoundException("feed not found"));
-        return new FeedBackResponse(feedback.getComment(), feedback.getRating(), feedback.getImages());
+        return new FeedBackResponse(feedback.getComment(), feedback.getRating(), feedback.getImages(),(long)feedback.getLikes().size(),(long)feedback.getDislikes().size());
 
     }
 
@@ -150,7 +150,10 @@ public class FeedBackServiceImpl implements FeedBackService {
         log.info("SIZE! :" + content.size());
         List<FeedBackResponse> responses = new ArrayList<>();
         for (Feedback feedback : content) {
-            responses.add(feedback.convert());
+            FeedBackResponse convert = feedback.convert();
+            convert.setLikes((long) feedback.getLikes().size());
+            convert.setDislikes((long) feedback.getDislikes().size());
+            responses.add(convert);
         }
         return PaginationFeedBack.builder().page(all.getNumber() + 1).
                 size(all.getTotalPages()).feedBackResponses(responses).build();
@@ -171,7 +174,8 @@ public class FeedBackServiceImpl implements FeedBackService {
         return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success Un liked this feedback!  " + feedBackId).build();
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public SimpleResponse disLike(Long feedBackId) {
         String emailCurrentUser = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.getByEmail(emailCurrentUser);
