@@ -6,27 +6,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.config.jwt.JwtService;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
 import project.dto.request.UserRequest;
 import project.dto.response.*;
 import project.dto.response.UserResponse;
-import project.entities.Address;
-import project.entities.House;
-import project.entities.User;
+import project.entities.*;
 import project.enums.Region;
+import project.enums.Role;
 import project.exception.AlreadyExistsException;
 import project.exception.BadRequestException;
 import project.exception.ForbiddenException;
 import project.exception.NotFoundException;
-import project.repository.AddressRepository;
-import project.repository.HouseRepository;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.service.UserService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,26 +37,33 @@ import java.util.Map;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final CardRepository cardRepository;
+    private final FavoriteRepository favoriteRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final HouseRepository houseRepository;
     private final AddressRepository addressRepository;
+
     @Override
+    @Transactional
     public SimpleResponse signUp(SignUpRequest signUpRequest) {
         boolean exist = userRepository.existsByEmail(signUpRequest.getEmail());
         if (exist) throw new AlreadyExistsException("Email already exists!!!");
         User user = new User();
+        user.setDateOfBirth(signUpRequest.getDateOfBirth());
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
-        user.setRole(signUpRequest.getRole());
+        user.setRole(Role.USER);
         userRepository.save(user);
+        Favorite favorite = new Favorite(LocalDate.now(),user,new ArrayList<>());
+        favoriteRepository.save(favorite);
         return SimpleResponse.builder()
-                        .httpStatus(HttpStatus.OK)
-                        .message("Success user saved!!!")
-                        .build();
+                .httpStatus(HttpStatus.OK)
+                .message("Success user saved!!!")
+                .build();
     }
 
     @Override
@@ -64,7 +71,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getByEmail(signInRequest.email());
         String password = user.getPassword();
         String decodePassword = signInRequest.password();
-        boolean matches = passwordEncoder.matches(decodePassword,password);
+        boolean matches = passwordEncoder.matches(decodePassword, password);
         if (!matches) {
             throw new ForbiddenException("Forbidden 403(wrong password)!");
         }
@@ -82,62 +89,64 @@ public class UserServiceImpl implements UserService {
     @Override
     public PaginationUserResponse findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<User> usersPage = userRepository.findAll(pageable);
-        List<UserResponse> userResponses = new ArrayList<>();
-        for (User user : usersPage) {
-            UserResponse userResponse = UserResponse.builder()
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .dateOfBirth(user.getDateOfBirth())
-                    .role(user.getRole())
-                    .isBlock(user.isBlock())
-                    .phoneNumber(user.getPhoneNumber())
-                    .build();
-
-            userResponses.add(userResponse);
+        Page<User> usersPage = userRepository.findAllMy(pageable);
+        List<User> content = usersPage.getContent();
+        List<UserResponse> responses = new ArrayList<>();
+        for (User u : content) {
+            responses.add(new UserResponse(u.getFirstName(), u.getLastName(),
+                    u.getEmail(), u.getDateOfBirth(), u.getRole(), u.isBlock(), u.getPhoneNumber()));
         }
-        return PaginationUserResponse.builder()
-                .page(usersPage.getNumber() + 1)
-                .size(size)
-                .userResponses(userResponses)
-                .build();
+        return new PaginationUserResponse(usersPage.getNumber() + 1, usersPage.getTotalPages(), responses);
+
     }
 
     @Override
-    public SimpleResponse update(Long userId, UserRequest userRequest) {
-        for (User user1 : userRepository.findAll()) {
-            if (!user1.getEmail().equals(userRequest.email())) {
-                User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id " + userId));
-                user.setFirstName(userRequest.firstName());
-                user.setLastName(userRequest.lastName());
-                user.setEmail(userRequest.email());
-                user.setPassword(passwordEncoder.encode(userRequest.password()));
-                user.setDateOfBirth(userRequest.dateOfBirth());
-                user.setRole(userRequest.role());
-                user.setBlock(userRequest.isBlock());
-                user.setPhoneNumber(userRequest.phoneNumber());
-                log.info("Success updated!!!");
-            }else throw new AlreadyExistsException("This email: "+userRequest.email()+" is already exists!");
-        }
-            return SimpleResponse.builder()
-                    .message("Success updated!!!")
-                    .httpStatus(HttpStatus.OK)
-                    .build();
+    @Transactional
+    public SimpleResponse update(SignUpRequest signUpRequest) {
+        User user = userRepository.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        boolean exist = userRepository.existsByEmail(signUpRequest.getEmail());
+        if (exist) throw new AlreadyExistsException("Email already exists!!!");
+        user.setFirstName(signUpRequest.getFirstName());
+        user.setLastName(signUpRequest.getLastName());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setDateOfBirth(signUpRequest.getDateOfBirth());
+        user.setPhoneNumber(signUpRequest.getPhoneNumber());
+        log.info("Success updated!!!");
+        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success updated!").build();
     }
 
     @Override
-    public SimpleResponse delete(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id " + userId));
-        for (House house : user.getHouses()) {
-            if (house.isBooked()){
-                throw new BadRequestException("User's booking isn't finished!");
+    @Transactional
+    public SimpleResponse delete() {
+        String emailCurrentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.getByEmail(emailCurrentUser);
+        for (int i = 0; i < currentUser.getHouses().size(); i++) {
+            House house = houseRepository.findById(currentUser.getHouses().get(i).getId()).get();
+            Address address = addressRepository.findByHouseId(house.getId());
+            if (address != null) {
+                address.setHouse(null);
+                addressRepository.delete(address);
             }
+            if (!house.getRentInfos().isEmpty()) {
+                RentInfo lastRentInfo = house.getRentInfos().getLast();
+                if (lastRentInfo != null && lastRentInfo.getCheckOut().isAfter(LocalDate.now())) {
+                    String clientEmail = lastRentInfo.getUser().getEmail();
+                    Card clientCard = cardRepository.findByUserEmail(clientEmail);
+                    String vendorEmail = house.getUser().getEmail();
+                    Card vendorCard = cardRepository.findByUserEmail(vendorEmail);
+                    vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
+                    clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
+                }
+            }
+            User user = house.getUser();
+            user.getHouses().remove(house);
+            house.setUser(null);
+            houseRepository.deleteById(house.getId());
         }
-        userRepository.deleteById(userId);
-        return SimpleResponse.builder()
-                .httpStatus(HttpStatus.OK)
-                .message("Success deleted!")
-                .build();
+        userRepository.delete(currentUser);
+        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted!").build();
+
     }
 
     @Override
@@ -153,6 +162,18 @@ public class UserServiceImpl implements UserService {
                 .isBlock(user.isBlock())
                 .phoneNumber(user.getPhoneNumber())
                 .build();
+    }
+
+    @Override
+    public UserResForAdmin findByIdForAdmin(Long userId) {
+        UserResForAdmin resForAdmin = userRepository.
+                findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id" + userId)).
+                convert();
+        List<HouseResForAdmin> allHouseByUserId = houseRepository.findAllHouseByUserId(userId);
+        log.info("RES SIZE:"  + allHouseByUserId.size());
+        resForAdmin.setHouseResForAdminList(allHouseByUserId);
+        return resForAdmin;
+
     }
 
 

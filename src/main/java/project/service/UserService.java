@@ -17,11 +17,13 @@ public interface UserService {
 
     PaginationUserResponse findAll(int page, int size);
 
-    SimpleResponse update(Long userId, UserRequest userRequest);
+    SimpleResponse update(SignUpRequest signUpRequest);
 
-    SimpleResponse delete(Long userId);
+    SimpleResponse delete();
 
     UserResponse findById(Long userId);
+
+    UserResForAdmin findByIdForAdmin(Long userId);
 
 //    Map<Region, List<HouseResponsesClass>> filterByRegion(Region region);
 }

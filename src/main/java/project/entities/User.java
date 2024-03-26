@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import project.dto.response.UserResForAdmin;
 import project.enums.Role;
 
 import java.time.LocalDate;
@@ -41,9 +42,9 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     //Relations
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private Card card;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany()
     private List<House> houses = new ArrayList<>();
 
     public User(String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, boolean isBlock, String phoneNumber) {
@@ -91,5 +92,9 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public UserResForAdmin convert() {
+        return new UserResForAdmin(this.firstName,this.lastName,this.email,this.dateOfBirth,this.role,this.isBlock(),this.phoneNumber);
     }
 }

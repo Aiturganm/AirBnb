@@ -14,5 +14,10 @@ import java.util.List;
 public class FeedBackResponse {
     String comm;
     private double rating;
+    List<String> images;
 
+    public FeedBackResponse(String comm, double rating) {
+        this.comm = comm;
+        this.rating = rating;
+    }
 }
