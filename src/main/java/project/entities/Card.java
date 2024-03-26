@@ -23,7 +23,14 @@ public class Card extends BaseEntity{
     public void addMoney(BigDecimal newMoney){
         if(this.money == null) this.money = BigDecimal.valueOf(0);
         BigDecimal add = this.money.add(newMoney);
+        setMoney(add);
     }
+
+    public void subtractMoney(BigDecimal newMoney){
+        BigDecimal subtract = this.money.subtract(newMoney);
+        setMoney(subtract);
+    }
+
     public Card( int carNumber, BigDecimal money) {
         this.carNumber = carNumber;
         this.money = money;

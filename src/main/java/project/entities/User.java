@@ -41,7 +41,7 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     //Relations
-    @OneToOne
+    @OneToOne(mappedBy = "user")
     private Card card;
     @OneToMany(fetch = FetchType.EAGER)
     private List<House> houses = new ArrayList<>();
