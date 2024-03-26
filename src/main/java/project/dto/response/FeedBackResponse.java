@@ -15,9 +15,17 @@ public class FeedBackResponse {
     String comm;
     private double rating;
     List<String> images;
+    Long likes;
+    Long dislikes;
 
     public FeedBackResponse(String comm, double rating) {
         this.comm = comm;
         this.rating = rating;
+    }
+
+    public FeedBackResponse(String comm, double rating, List<String> images) {
+        this.comm = comm;
+        this.rating = rating;
+        this.images = images;
     }
 }
