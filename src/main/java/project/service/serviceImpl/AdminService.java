@@ -6,23 +6,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.dto.request.AcceptOrRejectReq;
-import project.dto.response.HouseResponse;
 import project.dto.response.SimpleResponse;
 import project.entities.*;
 import project.enums.ActionForHouse;
 import project.enums.BlockOrUnBlock;
 import project.enums.Role;
 import project.exception.NotFoundException;
-import project.repository.AddressRepository;
-import project.repository.CardRepository;
-import project.repository.HouseRepository;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.service.HouseService;
 import project.service.UserService;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +25,7 @@ import java.util.List;
 public class AdminService {
     private final UserService userService;
     private final HouseService houseService;
+    private final FavoriteRepository favoriteRepository;
     private final HouseRepository houseRepository;
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
@@ -63,8 +59,10 @@ public class AdminService {
                 Card clientCard = cardRepository.findByUserEmail(clientEmail);
                 String vendorEmail = house.getUser().getEmail();
                 Card vendorCard = cardRepository.findByUserEmail(vendorEmail);
-                vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
-                clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
+                if (vendorCard != null && clientCard != null) {
+                    vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
+                    clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
+                }
             }
         }
         User user = house.getUser();

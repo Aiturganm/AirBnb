@@ -57,6 +57,7 @@ public class CardServiceImpl implements CardService {
     public SimpleResponse update(BigDecimal money) {
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Card currentUserCurd = cardRepository.findByUserEmail(currentUserEmail);
+        if (currentUserCurd == null) return SimpleResponse.builder().httpStatus(HttpStatus.BAD_REQUEST).message("You dont have card!").build();
         currentUserCurd.setMoney(currentUserCurd.getMoney().add(money));
         return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success added money: " + money).build();
     }
@@ -66,6 +67,8 @@ public class CardServiceImpl implements CardService {
     public SimpleResponse delete() {
         User currentUser = getCurrentUser();
         Card card = cardRepository.findByUserEmail(currentUser.getEmail());
+        if (card == null) return SimpleResponse.builder().httpStatus(HttpStatus.BAD_REQUEST).message("You dont have card!").build();
+
         card.setUser(null);
         currentUser.setCard(null);
         cardRepository.delete(card);
