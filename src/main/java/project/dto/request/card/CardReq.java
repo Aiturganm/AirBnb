@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import project.dto.response.SimpleResponse;
 import project.entities.Card;
+import project.validation.CardValidation;
 import project.validation.PriceValidation;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 public class CardReq {
-    @NotNull
+    @CardValidation
     private int cardNumber;
     @PriceValidation
     private BigDecimal money;

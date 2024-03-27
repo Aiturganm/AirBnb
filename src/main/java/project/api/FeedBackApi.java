@@ -57,7 +57,7 @@ public class FeedBackApi {
             @ApiResponse(responseCode = "404", description = "Отзыв с указанным ID не найден")
     })
     @PutMapping("/updateFeed/{feedId}")
-    public SimpleResponse updateFeed(@RequestBody FeedBackRequest feedBackRequest, @PathVariable Long feedId, Principal principal) {
+    public SimpleResponse updateFeed(@RequestBody @Valid  FeedBackRequest feedBackRequest, @PathVariable Long feedId, Principal principal) {
         return feedBackService.updateFeed(feedBackRequest, feedId, principal);
     }
 

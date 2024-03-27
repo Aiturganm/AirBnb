@@ -35,7 +35,7 @@ public class HouseApi {
             @ApiResponse(responseCode = "404", description = "Регион или улица не найдены")
     })
     @PostMapping("/saveHouse")
-    public SimpleResponse saveHouse(@RequestBody HouseRequest houseRequest, Principal principal, @RequestParam HouseType houseType,@RequestParam Region region) {
+    public SimpleResponse saveHouse(@RequestBody @Valid HouseRequest houseRequest, Principal principal, @RequestParam HouseType houseType,@RequestParam Region region) {
         return houseService.saveHouse(houseRequest , principal, houseType,region);
     }
 
@@ -68,7 +68,7 @@ public class HouseApi {
             @ApiResponse(responseCode = "200", description = "Список всех домов успешно получен")
     })
     @GetMapping("/findAllHouses")
-    public PaginationResponse AllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+    public PaginationResponse allHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
         return houseService.allHouses(page,size);
     }
 
@@ -79,7 +79,7 @@ public class HouseApi {
             @ApiResponse(responseCode = "200", description = "Список всех непубликованных домов успешно получен")
     })
     @GetMapping("/findAllNotPublishedHouses")
-    public PaginationResponse NotAllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
+    public PaginationResponse notAllHouses(@RequestParam(defaultValue = "1") int page,@RequestParam(defaultValue = "4") int size){
         return houseService.notPublishedHouses(page,size);    }
 
     @Secured({"VENDOR","ADMIN"})

@@ -1,5 +1,6 @@
 package project.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Builder
@@ -8,5 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AcceptOrRejectReq {
+    @NotBlank
     private String reason;
 }

@@ -3,6 +3,7 @@ package project.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class AddressApi {
     @PutMapping("/updateByHouseId/{houseId}")
     public SimpleResponse update(@PathVariable Long houseId,
                                  @RequestParam Region region,
-                                 @RequestBody AddressRequest addressRequest) {
+                                 @RequestBody @Valid AddressRequest addressRequest) {
         return addressService.update(houseId, region, addressRequest);
     }
 }
