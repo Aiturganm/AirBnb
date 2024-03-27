@@ -43,12 +43,6 @@ public class AddressServiceImpl implements AddressService {
                 .message("Saved address!")
                 .build();
     }
-
-    @Override
-    public List<HouseResponsesClass> getRegionHouses(Region region) {
-        return addressRepository.findByRegion(region);
-       }
-
     @Override
     public SimpleResponse update(Long addressId,Region region ,AddressRequest addressRequest) {
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new NotFoundException("Not found address with id " + addressId));

@@ -11,7 +11,5 @@ import java.util.List;
 public interface AddressService {
     SimpleResponse save(Long houseId, Region region, AddressRequest addressRequest);
 
-    List<HouseResponsesClass> getRegionHouses(Region region);
-
     SimpleResponse update(Long addressId,Region region,AddressRequest addressRequest);
 }

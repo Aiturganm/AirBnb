@@ -21,12 +21,8 @@ public class AddressApi {
     @PostMapping("save/{houseId}")
     public SimpleResponse saveAddress(@PathVariable Long houseId,
                                       @RequestParam Region region,
-                                      @RequestBody AddressRequest addressRequest){
-        return addressService.save(houseId,region,addressRequest);
-    }
-    @PutMapping("/houses")
-    public List<HouseResponsesClass> getRegionHouses(@RequestParam Region region){
-        return addressService.getRegionHouses(region);
+                                      @RequestBody AddressRequest addressRequest) {
+        return addressService.save(houseId, region, addressRequest);
     }
 
     @PutMapping("/{addressId}")
