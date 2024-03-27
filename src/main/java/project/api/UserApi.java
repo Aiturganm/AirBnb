@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class UserApi {
     @PutMapping("/update")
     @Operation(summary = "Обновляет информацию о пользователе.")
     public SimpleResponse update(
-            @RequestBody SignUpRequest signUpRequest) {
+            @RequestBody @Valid SignUpRequest signUpRequest) {
         return userService.update(signUpRequest);
     }
 
