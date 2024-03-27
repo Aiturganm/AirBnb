@@ -2,12 +2,10 @@ package project.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.catalina.LifecycleState;
 import project.dto.response.HouseResponse;
 import project.enums.HouseType;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

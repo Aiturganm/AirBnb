@@ -113,7 +113,8 @@ public class UserServiceImpl implements UserService {
         user.setDateOfBirth(signUpRequest.getDateOfBirth());
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
         log.info("Success updated!!!");
-        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success updated!").build();
+        String token = jwtService.createToken(user);
+        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("YOUR NEW TOKEN!"  +  token).build();
     }
 
     @Override
@@ -144,6 +145,8 @@ public class UserServiceImpl implements UserService {
             house.setUser(null);
             houseRepository.deleteById(house.getId());
         }
+        Favorite byUserEmail = favoriteRepository.findByUserEmail(currentUser.getEmail());
+        favoriteRepository.delete(byUserEmail);
         userRepository.delete(currentUser);
         return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted!").build();
 
