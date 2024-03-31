@@ -25,6 +25,8 @@ import java.time.LocalDate;
 public class AdminService {
     private final UserService userService;
     private final HouseService houseService;
+    private final RentInfoRepository rentInfoRepository;
+    private final FeedBackRepository feedBackRepository;
     private final FavoriteRepository favoriteRepository;
     private final HouseRepository houseRepository;
     private final UserRepository userRepository;
@@ -47,11 +49,13 @@ public class AdminService {
             house.setReason(acceptOrRejectReq.getReason());
             return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success reject this house:  " + house.getId()).build();
         }
-        Address address = addressRepository.findByHouseId(houseId);
-        if (address != null) {
-            address.setHouse(null);
-            addressRepository.delete(address);
+        house.getFavorites().forEach(favorite -> favorite.getHouses().remove(house));
+        log.info("ONE SUCCESS");
+        Address byHouseId = addressRepository.findByHouseId(house.getId());
+        if (byHouseId != null) {
+            addressRepository.delete(byHouseId);
         }
+        feedBackRepository.deleteAll(house.getFeedbacks());
         if (!house.getRentInfos().isEmpty()) {
             RentInfo lastRentInfo = house.getRentInfos().getLast();
             if (lastRentInfo != null && lastRentInfo.getCheckOut().isAfter(LocalDate.now())) {
@@ -59,16 +63,13 @@ public class AdminService {
                 Card clientCard = cardRepository.findByUserEmail(clientEmail);
                 String vendorEmail = house.getUser().getEmail();
                 Card vendorCard = cardRepository.findByUserEmail(vendorEmail);
-                if (vendorCard != null && clientCard != null) {
-                    vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
-                    clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
-                }
+                vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
+                clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
             }
         }
-        User user = house.getUser();
-        user.getHouses().remove(house);
-        house.setUser(null);
-        houseRepository.deleteById(houseId);
+        rentInfoRepository.deleteAll(house.getRentInfos());
+        houseRepository.delete(house);
+        log.info("TWO SUCCESS");
         return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted this houses").build();
 
     }
