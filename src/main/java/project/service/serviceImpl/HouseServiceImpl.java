@@ -18,10 +18,7 @@ import project.enums.HouseType;
 import project.enums.Region;
 import project.enums.Role;
 import project.exception.NotFoundException;
-import project.repository.AddressRepository;
-import project.repository.CardRepository;
-import project.repository.HouseRepository;
-import project.repository.UserRepository;
+import project.repository.*;
 import project.service.HouseService;
 
 import java.math.BigDecimal;
@@ -37,8 +34,10 @@ public class HouseServiceImpl implements HouseService {
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
     private final AddressRepository addressRepository;
+    private final RentInfoRepository rentInfoRepository;
     private final HouseRepository houseRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FeedBackRepository feedBackRepository;
     private final JwtService jwtService;
 
     //    @PostConstruct
@@ -173,7 +172,13 @@ public class HouseServiceImpl implements HouseService {
         User currentUser = userRepository.getByEmail(emailCurrentUser);
         House findHouse = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("House not found!" + houseId));
         if (currentUser.getHouses().contains(findHouse)) {
-            log.info("DELETE HOUSE 1-if");
+            findHouse.getFavorites().forEach(favorite -> favorite.getHouses().remove(findHouse));
+            log.info("ONE SUCCESS");
+            Address byHouseId = addressRepository.findByHouseId(findHouse.getId());
+            if (byHouseId != null) {
+                addressRepository.delete(byHouseId);
+            }
+            feedBackRepository.deleteAll(findHouse.getFeedbacks());
             if (!findHouse.getRentInfos().isEmpty()) {
                 RentInfo lastRentInfo = findHouse.getRentInfos().getLast();
                 if (lastRentInfo != null && lastRentInfo.getCheckOut().isAfter(LocalDate.now())) {
@@ -185,13 +190,12 @@ public class HouseServiceImpl implements HouseService {
                     clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
                 }
             }
-            Address address = addressRepository.findByHouseId(houseId);
-            if (address != null) {
-                address.setHouse(null);
-                addressRepository.delete(address);
-            }
-            User user = findHouse.getUser();
-            user.getHouses().remove(findHouse);
+            rentInfoRepository.deleteAll(findHouse.getRentInfos());
+            houseRepository.delete(findHouse);
+            log.info("TWO SUCCESS");
+
+
+            currentUser.getHouses().remove(findHouse);
             findHouse.setUser(null);
             houseRepository.deleteById(findHouse.getId());
             return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted this houses").build();
