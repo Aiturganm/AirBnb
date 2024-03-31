@@ -19,6 +19,6 @@ public class Favorite extends BaseEntity{
     private LocalDate createdAt;
     @OneToOne()
     private User user;
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<House> houses = new ArrayList<>();
 }

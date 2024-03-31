@@ -44,7 +44,7 @@ public class User extends BaseEntity implements UserDetails {
     //Relations
     @OneToOne(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
     private Card card;
-    @OneToMany()
+    @OneToMany(cascade = CascadeType.REMOVE)
     private List<House> houses = new ArrayList<>();
 
     public User(String firstName, String lastName, String email, String password, LocalDate dateOfBirth, Role role, boolean isBlock, String phoneNumber) {

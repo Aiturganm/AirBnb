@@ -32,7 +32,8 @@ public class House extends BaseEntity{
     private boolean isPublished;
     private boolean isBlock;
     private String reason;
-
+    @ManyToMany(mappedBy = "houses",cascade = {CascadeType.DETACH}, fetch = FetchType.EAGER)
+    private List<Favorite> favorites;
     public House( String nameOfHotel, String description, List<String> images, byte room, HouseType houseType, BigDecimal price, byte rating, boolean isBooked, int guests, boolean isPublished, boolean isBlock) {
         this.nameOfHotel = nameOfHotel;
         this.description = description;
@@ -49,8 +50,6 @@ public class House extends BaseEntity{
 
     @OneToMany(mappedBy = "house", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     private List<Feedback> feedbacks;
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
-    private List<Favorite> favorites;
     @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private User user;
     @OneToMany(mappedBy = "house", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)

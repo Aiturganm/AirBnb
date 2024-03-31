@@ -40,6 +40,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     public SimpleResponse save(Long houseId) {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("Not found  house with id " + houseId));
+        if (!house.isPublished()) return SimpleResponse.builder().httpStatus(HttpStatus.FORBIDDEN).message("THIS HOUSE NO PUBLISHED!").build();
         String emailCurrentUser = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(emailCurrentUser).orElseThrow(() -> new NotFoundException("Not found user with email " + emailCurrentUser));
         Favorite currentUsFav = favoriteRepository.findByUserEmail(currentUser.getEmail());
