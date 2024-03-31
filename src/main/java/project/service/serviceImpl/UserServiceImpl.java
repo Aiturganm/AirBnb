@@ -13,14 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import project.config.jwt.JwtService;
 import project.dto.request.SignInRequest;
 import project.dto.request.SignUpRequest;
-import project.dto.request.UserRequest;
-import project.dto.response.*;
 import project.dto.response.UserResponse;
+import project.dto.response.*;
 import project.entities.*;
-import project.enums.Region;
 import project.enums.Role;
 import project.exception.AlreadyExistsException;
-import project.exception.BadRequestException;
 import project.exception.ForbiddenException;
 import project.exception.NotFoundException;
 import project.repository.*;
@@ -28,17 +25,17 @@ import project.service.UserService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RentInfoRepository rentInfoRepository;
     private final CardRepository cardRepository;
     private final FavoriteRepository favoriteRepository;
+    private final FeedBackRepository feedBackRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final HouseRepository houseRepository;
@@ -58,7 +55,7 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
         user.setRole(Role.USER);
         userRepository.save(user);
-        Favorite favorite = new Favorite(LocalDate.now(),user,new ArrayList<>());
+        Favorite favorite = new Favorite(LocalDate.now(), user, new ArrayList<>());
         favoriteRepository.save(favorite);
         return SimpleResponse.builder()
                 .httpStatus(HttpStatus.OK)
@@ -114,7 +111,7 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(signUpRequest.getPhoneNumber());
         log.info("Success updated!!!");
         String token = jwtService.createToken(user);
-        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("YOUR NEW TOKEN!"  +  token).build();
+        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("YOUR NEW TOKEN!" + token).build();
     }
 
     @Override
@@ -122,34 +119,18 @@ public class UserServiceImpl implements UserService {
     public SimpleResponse delete() {
         String emailCurrentUser = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.getByEmail(emailCurrentUser);
-        for (int i = 0; i < currentUser.getHouses().size(); i++) {
-            House house = houseRepository.findById(currentUser.getHouses().get(i).getId()).get();
-            Address address = addressRepository.findByHouseId(house.getId());
-            if (address != null) {
-                address.setHouse(null);
-                addressRepository.delete(address);
-            }
-            if (!house.getRentInfos().isEmpty()) {
-                RentInfo lastRentInfo = house.getRentInfos().getLast();
-                if (lastRentInfo != null && lastRentInfo.getCheckOut().isAfter(LocalDate.now())) {
-                    String clientEmail = lastRentInfo.getUser().getEmail();
-                    Card clientCard = cardRepository.findByUserEmail(clientEmail);
-                    String vendorEmail = house.getUser().getEmail();
-                    Card vendorCard = cardRepository.findByUserEmail(vendorEmail);
-                    vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
-                    clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
-                }
-            }
-            User user = house.getUser();
-            user.getHouses().remove(house);
-            house.setUser(null);
-            houseRepository.deleteById(house.getId());
+        if (currentUser.getRole().equals(Role.USER)) {
+            List<Feedback> feedbacks = feedBackRepository.findByUserId(currentUser.getId());
+            feedbacks.forEach(feedback -> feedback.setUser(null));
+            Favorite favorite = favoriteRepository.findByUserEmail(currentUser.getEmail());
+            favorite.setHouses(new ArrayList<>());
+            favoriteRepository.delete(favorite);
+            List<RentInfo> allByUser = rentInfoRepository.findAllByUser(currentUser.getId());
+            rentInfoRepository.deleteAll(allByUser);
+            userRepository.delete(currentUser);
+            return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted!").build();
         }
-        Favorite byUserEmail = favoriteRepository.findByUserEmail(currentUser.getEmail());
-        favoriteRepository.delete(byUserEmail);
-        userRepository.delete(currentUser);
-        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("Success deleted!").build();
-
+        return deleteVendor(currentUser);
     }
 
     @Override
@@ -173,11 +154,45 @@ public class UserServiceImpl implements UserService {
                 findById(userId).orElseThrow(() -> new NotFoundException("Not found user with id" + userId)).
                 convert();
         List<HouseResForAdmin> allHouseByUserId = houseRepository.findAllHouseByUserId(userId);
-        log.info("RES SIZE:"  + allHouseByUserId.size());
+        log.info("RES SIZE:" + allHouseByUserId.size());
         resForAdmin.setHouseResForAdminList(allHouseByUserId);
         return resForAdmin;
 
     }
 
+    @Transactional
+    public SimpleResponse deleteVendor(User user) {
+        for (int i = 0; i < user.getHouses().size(); i++) {
+            House house = houseRepository.findById(user.getHouses().get(i).getId()).get();
+            house.getFavorites().forEach(favorite -> favorite.getHouses().remove(house));
+            log.info("ONE SUCCESS");
+            Address byHouseId = addressRepository.findByHouseId(house.getId());
+            if (byHouseId != null) {
+                addressRepository.delete(byHouseId);
+            }
+            feedBackRepository.deleteAll(house.getFeedbacks());
+            if (!house.getRentInfos().isEmpty()) {
+                RentInfo lastRentInfo = house.getRentInfos().getLast();
+                if (lastRentInfo != null && lastRentInfo.getCheckOut().isAfter(LocalDate.now())) {
+                    String clientEmail = lastRentInfo.getUser().getEmail();
+                    Card clientCard = cardRepository.findByUserEmail(clientEmail);
+                    String vendorEmail = house.getUser().getEmail();
+                    Card vendorCard = cardRepository.findByUserEmail(vendorEmail);
+                    vendorCard.setMoney(vendorCard.getMoney().subtract(lastRentInfo.getTotalPrice()));
+                    clientCard.setMoney(clientCard.getMoney().add(lastRentInfo.getTotalPrice()));
+                }
+            }
+            rentInfoRepository.deleteAll(house.getRentInfos());
+            houseRepository.delete(house);
+            log.info("TWO SUCCESS");
+        }
+        Favorite favorite = favoriteRepository.findByUserEmail(user.getEmail());
+        favorite.setHouses(null);
+        favoriteRepository.delete(favorite);
+        log.info("THREE SUCCESS");
+        userRepository.delete(user);
+        return SimpleResponse.builder().httpStatus(HttpStatus.OK).message("SUCCESS").build();
+
+    }
 
 }

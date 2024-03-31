@@ -43,6 +43,9 @@ public class RentInfoServiceImpl implements RentInfoService {
         String name = principal.getName();
         User user = userRepository.getByEmail(name);
         Long houseId = request.houseId();
+        if (request.checkIn().isBefore(LocalDate.now())){
+            throw new BadRequestException("Check in date in incorrect!");
+        }
         House house = houseRepository.findById(houseId).orElseThrow(() ->
                 new NotFoundException("House with id " + houseId + " not found"));
 

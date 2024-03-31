@@ -37,11 +37,12 @@ public class FeedBackServiceImpl implements FeedBackService {
     private final UserRepository userRepository;
     private final HouseRepository houseRepository;
 
-    @Override
+    @Override @Transactional
     public SimpleResponse saveFeedBack(FeedBackRequest feedBackRequest, Principal principal, Long houseId) {
         String name = principal.getName();
         User byEmail = userRepository.getByEmail(name);
         House house = houseRepository.findById(houseId).orElseThrow(() -> new NotFoundException("House not found"));
+        if (!house.isPublished()) return SimpleResponse.builder().httpStatus(HttpStatus.FORBIDDEN).message("THIS HOUSE NO PUBLISHED!").build();
         Feedback feedback = new Feedback();
         feedback.setHouse(house);
         feedback.setUser(byEmail);
